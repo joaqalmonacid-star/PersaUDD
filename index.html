@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CampusSwap · Compra y vende libros, calculadoras e implementos usados entre estudiantes de la UDD.">
+    <title>CampusSwap · Compra y vende implementos en tu U</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #fafafa;
+            --surface: #ffffff;
+            --text-main: #09090b;
+            --text-muted: #52525b;
+            --primary: #18181b;
+            --accent: #2563eb;
+            --accent-soft: #eff6ff;
+            --accent-hover: #1d4ed8;
+            --emerald: #059669;
+            --emerald-soft: #ecfdf5;
+            --amber: #d97706;
+            --amber-soft: #fffbeb;
+            --border: #e4e4e7;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            background-image: radial-gradient(#e4e4e7 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 5rem;
+        }
+
+        /* Navbar minimalista */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.25rem;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .campus-pill {
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.35rem 0.85rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .pulse {
+            width: 7px;
+            height: 7px;
+            background: var(--emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px var(--emerald-soft);
+        }
+
+        /* Grid Principal: Propuesta + Preview vs Formulario */
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.95fr;
+            gap: 3.5rem;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+        }
+
+        /* Columna Izquierda */
+        .eyebrow {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1.25rem;
+        }
+
+        h1 {
+            font-size: clamp(2.1rem, 4vw, 2.85rem);
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1.12;
+            margin-bottom: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .lead {
+            font-size: 1.08rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            max-width: 52ch;
+        }
+
+        /* Preview visual del MVP (MoSCoW: Filtros + Estados de venta) */
+        .mvp-preview {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preview-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .filter-pills {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            background: #f4f4f5;
+            color: var(--text-muted);
+        }
+
+        .pill.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .mock-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .mock-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: #fcfcfd;
+        }
+
+        .mock-info strong {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .mock-info span {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .mock-meta {
+            text-align: right;
+        }
+
+        .price {
+            display: block;
+            font-weight: 800;
+            font-size: 0.92rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            display: inline-block;
+        }
+
+        .status-available {
+            background: var(--emerald-soft);
+            color: var(--emerald);
+        }
+
+        .status-reserved {
+            background: var(--amber-soft);
+            color: var(--amber);
+        }
+
+        /* Beneficios clave sin cajas pesadas */
+        .benefits {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 520px) {
+            .benefits {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .benefit-item h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .benefit-item p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Columna Derecha: Tarjeta de Formulario */
+        .form-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-card-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-card-header h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.35rem;
+        }
+
+        .form-card-header p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        label.field-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select {
+            width: 100%;
+            padding: 0.75rem 0.9rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.92rem;
+            color: var(--text-main);
+            background: var(--surface);
+            transition: all 0.15s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        /* Opciones de Rol interactivas */
+        .role-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .role-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.8rem 0.95rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .role-option:hover {
+            border-color: #a1a1aa;
+        }
+
+        .role-option:has(input:checked) {
+            border-color: var(--accent);
+            background-color: var(--accent-soft);
+        }
+
+        .role-option input[type="radio"] {
+            margin-top: 0.2rem;
+            accent-color: var(--accent);
+        }
+
+        .role-text strong {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .role-text span {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Bloque Condicional Vendedor */
+        #seller-panel {
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.15rem;
+            background: #f8fafc;
+            border: 1px solid #dbeafe;
+            border-radius: var(--radius-md);
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chips-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+        }
+
+        .chip-checkbox {
+            cursor: pointer;
+        }
+
+        .chip-checkbox input {
+            display: none;
+        }
+
+        .chip-checkbox span {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 0.75rem;
+            border-radius: 999px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .chip-checkbox input:checked + span {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: white;
+        }
+
+        .early-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .early-check input {
+            margin-top: 0.15rem;
+            accent-color: var(--accent);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.95rem 1.25rem;
+            background: var(--primary);
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        .trust-note {
+            text-align: center;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        /* Estado de Éxito */
+        #success-state {
+            display: none;
+            text-align: center;
+            padding: 1.5rem 0.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--emerald-soft);
+            color: var(--emerald);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        #success-state h3 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        #success-state p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+        }
+
+        .btn-share {
+            display: inline-block;
+            padding: 0.65rem 1.1rem;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: border-color 0.15s;
+        }
+
+        .btn-share:hover {
+            border-color: var(--text-main);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <div class="logo">
+                <span class="logo-dot"></span> CampusSwap
+            </div>
+            <div class="campus-pill">
+                <span class="pulse"></span> Piloto Fin de Semestre · UDD
+            </div>
+        </nav>
+
+        <main class="hero-grid">
+            <!-- Columna Izquierda: Propuesta de valor + Vista previa del MVP -->
+            <div>
+                <span class="eyebrow">Mercado Estudiantil Verificado</span>
+                <h1>Vende tus cosas de ramo antes de irte de vacaciones.</h1>
+                <p class="lead">
+                    Olvídate de subir historias que nadie ve o responder veinte veces "¿sigue disponible?". Publica en segundos y entrega entre clases dentro del campus.
+                </p>
+
+                <!-- Mockup funcional de los MUST del MoSCoW -->
+                <div class="mvp-preview">
+                    <div class="preview-header">
+                        <span class="preview-title">Así se verá el catálogo</span>
+                        <div class="filter-pills">
+                            <span class="pill active">Todos</span>
+                            <span class="pill">Arquitectura</span>
+                            <span class="pill">Ingeniería</span>
+                            <span class="pill">Salud</span>
+                        </div>
+                    </div>
+                    <div class="mock-items">
+                        <div class="mock-card">
+                            <div class="mock-info">
+                                <strong>Calculadora Científica Casio fx-991</strong>
+                                <span>Cálculo I · Entrega en Patio Central</span>
+                            </div>
+                            <div class="mock-meta">
+                                <span class="price">$12.000</span>
+                                <span class="status-badge status-available">● Disponible</span>
+                            </div>
+                        </div>
+                        <div class="mock-card">
+                            <div class="mock-info">
+                                <strong>Set Reglas Escala + Bisturí Maqueta</strong>
+                                <span>Taller Arquitectura · Poco uso</span>
+                            </div>
+                            <div class="mock-meta">
+                                <span class="price">$8.500</span>
+                                <span class="status-badge status-reserved">◐ Reservado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="benefits">
+                    <div class="benefit-item">
+                        <h3>🔒 100% Comunidad UDD</h3>
+                        <p>Acceso exclusivo con correo institucional. Cero estafas ni cuentas falsas.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <h3>⚡ Estado en tiempo real</h3>
+                        <p>Si alguien lo reserva, se marca al instante. Sin mensajes innecesarios.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Formulario de Validación -->
+            <div class="form-card">
+                <div id="form-container">
+                    <div class="form-card-header">
+                        <h2>Súmate al lanzamiento</h2>
+                        <p>Regístrate en 20 segundos para activar el intercambio en tu facultad.</p>
+                    </div>
+
+                    <form id="validation-form">
+                        <div class="field">
+                            <label class="field-label" for="email">Correo institucional</label>
+                            <input type="email" id="email" name="email" placeholder="tunombre@udd.cl" required>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="carrera">Carrera</label>
+                            <input type="text" id="carrera" name="carrera" placeholder="Ej. Arquitectura, Ing. Comercial, Medicina..." required>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">¿Qué te interesa hacer hoy?</label>
+                            <div class="role-cards">
+                                <label class="role-option">
+                                    <input type="radio" name="rol" value="vender" required>
+                                    <div class="role-text">
+                                        <strong>Tengo implementos para vender</strong>
+                                        <span>Terminé ramos y tengo cosas guardadas sin usar</span>
+                                    </div>
+                                </label>
+                                <label class="role-option">
+                                    <input type="radio" name="rol" value="comprar">
+                                    <div class="role-text">
+                                        <strong>Busco comprar más barato</strong>
+                                        <span>Necesito libros, calculadora o materiales usados</span>
+                                    </div>
+                                </label>
+                                <label class="role-option">
+                                    <input type="radio" name="rol" value="ambos">
+                                    <div class="role-text">
+                                        <strong>Ambos (Vender y comprar)</strong>
+                                        <span>Quiero renovar mis cosas para el próximo semestre</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Panel dinámico para medir oferta real (Meta: 1 de cada 5 estudiantes) -->
+                        <div id="seller-panel">
+                            <div class="field">
+                                <label class="field-label">¿Qué tienes guardado para vender? (Selecciona)</label>
+                                <div class="chips-grid">
+                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="calculadora"><span>Calculadora</span></label>
+                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="libros"><span>Libros / Guías</span></label>
+                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="maqueta"><span>Material Maqueta</span></label>
+                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="bata"><span>Bata / Lab</span></label>
+                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="electronica"><span>Cables / Tech</span></label>
+                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="otro"><span>Otro</span></label>
+                                </div>
+                            </div>
+
+                            <div class="field">
+                                <label class="field-label" for="canal_actual">¿Dónde intentaste venderlos antes?</label>
+                                <select id="canal_actual" name="canal_actual">
+                                    <option value="guardados">Aún no lo intento, siguen en mi pieza</option>
+                                    <option value="instagram">Historias de Instagram</option>
+                                    <option value="whatsapp">Grupos de WhatsApp</option>
+                                    <option value="marketplace">Marketplace / Yapo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <label class="early-check">
+                            <input type="checkbox" id="early_access" name="early_access" checked>
+                            <span>Quiero participar en el piloto de prueba esta semana y tener acceso anticipado.</span>
+                        </label>
+
+                        <button type="submit" class="btn-submit">
+                            Quiero acceso anticipado <span>→</span>
+                        </button>
+                        <p class="trust-note">Sin pagos en la app · Trato directo en el campus · 0% comisión</p>
+                    </form>
+                </div>
+
+                <!-- Pantalla post-registro -->
+                <div id="success-state">
+                    <div class="success-icon">✓</div>
+                    <h3>¡Cupo reservado!</h3>
+                    <p>Ya eres parte de la lista fundadora en el campus. Te escribiremos al correo apenas habilitemos la carga de productos esta semana.</p>
+                    <button type="button" class="btn-share" id="copy-link-btn">Copiar link para compartir en tu grupo</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mostrar/ocultar panel de inventario vendedor
+        const roleRadios = document.querySelectorAll('input[name="rol"]');
+        const sellerPanel = document.getElementById('seller-panel');
+
+        roleRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'vender' || e.target.value === 'ambos') {
+                    sellerPanel.style.display = 'flex';
+                } else {
+                    sellerPanel.style.display = 'none';
+                }
+            });
+        });
+
+        // Envío y analítica de conversión
+        const form = document.getElementById('validation-form');
+        const formContainer = document.getElementById('form-container');
+        const successState = document.getElementById('success-state');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const items = Array.from(document.querySelectorAll('input[name="items"]:checked')).map(i => i.value);
+            const rol = formData.get('rol');
+
+            const data = {
+                timestamp: new Date().toISOString(),
+                email: formData.get('email'),
+                carrera: formData.get('carrera'),
+                rol: rol,
+                tiene_algo_para_vender: (rol === 'vender' || rol === 'ambos'),
+                items: items,
+                canal_actual: formData.get('canal_actual') || 'N/A',
+                early_access: document.getElementById('early_access').checked
+            };
+
+            // Evento para Google Tag Manager / GA4
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+                'event': 'validacion_form_submit',
+                'rol_estudiante': data.rol,
+                'es_vendedor': data.tiene_algo_para_vender
+            });
+
+            console.log('Validación registrada:', data);
+
+            // Conectar aquí tu Google Apps Script / Formspree / Make:
+            /*
+            await fetch('TU_ENDPOINT_AQUI', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            */
+
+            formContainer.style.display = 'none';
+            successState.style.display = 'block';
+        });
+
+        // Botón viral para compartir en WhatsApp de generación
+        document.getElementById('copy-link-btn').addEventListener('click', function() {
+            navigator.clipboard.writeText(window.location.href);
+            this.textContent = '¡Link copiado al portapapeles!';
+            setTimeout(() => {
+                this.textContent = 'Copiar link para compartir en tu grupo';
+            }, 2500);
+        });
+    </script>
+</body>
+</html>

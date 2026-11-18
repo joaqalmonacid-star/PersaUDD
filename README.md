@@ -1,6 +1,6 @@
-# CampusSwap
+# OllaComun
 
-> Nombre **provisional**. Pendiente de definir el nombre final y el logo.
+> Nombre definitivo: **OllaComun**. Pendiente: el logo.
 
 Landing de inicio + formulario de validación para el **Desafío 4: "Segunda mano en el campus"** (Unidad 3, Fichas de desafíos digitales · Desarrollo de Productos · New Ventures Program).
 
@@ -11,7 +11,7 @@ Landing de inicio + formulario de validación para el **Desafío 4: "Segunda man
 1. **Hero con el formulario grande y destacado** — es lo primero que se ve.
 2. **Ejemplo de productos en venta** — nombre, precio, descripción, categoría, estado (`Disponible`/`Reservado`) y punto de entrega en el campus.
 3. **Integración con Brevo sin Netlify** — al enviar el formulario:
-   - Se crea/actualiza un **contacto** en la lista `CampusSwap - Lista fundadora` de Brevo.
+   - Se crea/actualiza un **contacto** en la lista `OllaComun - Lista fundadora` de Brevo.
    - Brevo envía un correo de **confirmación y agradecimiento** al estudiante.
    - Brevo envía un correo de **aviso a administración** (`administracionollacomun@gmail.com`) con todos los datos.
 
@@ -21,7 +21,7 @@ Landing de inicio + formulario de validación para el **Desafío 4: "Segunda man
 | --- | --- |
 | Remitente verificado `administracionollacomun@gmail.com` | ✅ existente |
 | Atributos `CARRERA`, `ROL`, `ITEMS`, `DETALLE`, `CANAL_ACTUAL`, `EARLY_ACCESS` | ✅ creados |
-| Lista `CampusSwap - Lista fundadora` (ID `3`) | ✅ creada |
+| Lista `OllaComun - Lista fundadora` (ID `3`) | ✅ creada |
 | Contacto de administración | ✅ creado |
 | Secreto `BREVO_API_KEY` en GitHub Actions | ✅ configurado |
 | GitHub Pages (build por Actions) | ✅ activado |
@@ -79,5 +79,20 @@ Cada push a `main` dispara el workflow y actualiza el sitio automáticamente.
 - [x] Contactos, atributos y lista creados en Brevo.
 - [x] Envío de confirmación al estudiante y aviso a administración.
 - [x] Clave como secreto de GitHub + deploy automático en Pages.
-- [ ] Nombre y logo definitivos.
+- [x] Nombre definitivo: OllaComun.
+- [x] Imágenes reales de los productos con licencia libre.
+- [ ] Logo definitivo.
 - [ ] Pruebas con estudiantes reales y medición de umbrales.
+
+## Créditos de las imágenes
+
+Las fotos están en `images/` y son de dominio público o licencias libres (Wikimedia Commons), sin derechos de autor restrictivos:
+
+| Producto | Archivo | Autor | Licencia | Fuente |
+| --- | --- | --- | --- | --- |
+| Calculadora | `calculadora.jpg` | mg | Dominio público | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Casio_fx-991MS_scientific_calculator_1aa.jpg) |
+| Escuadra y cartabón | `reglas.jpg` | Wiki LIC | CC BY-SA 4.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Delin_03_Escuadra%26Cartab%C3%B3nDSC00010.jpg) |
+| Libro de cálculo | `libro.jpg` | Dmitry Makeev | Dominio público | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Civer_of_Differential_and_integral_calculus_by_Nikolai_Piskunow.jpg) |
+| Bata de laboratorio | `bata.jpg` | Pi. from Leiden | CC BY 2.0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Lab_coats.jpg) |
+| Adaptador USB | `cables.jpg` | Fructibus | CC0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:USB_OTG_Type-C_Adapter_-_A.jpg) |
+| Compás de dibujo | `instrumentos.jpg` | Slashme | CC0 | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Anker_compass_wide.jpg) |

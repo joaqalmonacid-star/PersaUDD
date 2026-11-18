@@ -166,29 +166,31 @@
                         </div>
 
                         <form id="validation-form">
+                            <!-- Campo oculto: resumen legible usado en el correo de administración de Brevo -->
+                            <input type="hidden" id="detalle" name="DETALLE" value="">
                             <div class="field">
                                 <label class="field-label" for="email">Correo institucional</label>
-                                <input type="email" id="email" name="email" placeholder="tunombre@udd.cl" required>
+                                <input type="email" id="email" name="EMAIL" placeholder="tunombre@udd.cl" required>
                             </div>
 
                             <div class="field">
                                 <label class="field-label" for="carrera">Carrera</label>
-                                <input type="text" id="carrera" name="carrera" placeholder="Ej. Arquitectura, Ing. Comercial, Medicina..." required>
+                                <input type="text" id="carrera" name="CARRERA" placeholder="Ej. Arquitectura, Ing. Comercial, Medicina..." required>
                             </div>
 
                             <div class="field">
                                 <label class="field-label">¿Qué te interesa hacer hoy?</label>
                                 <div class="role-cards">
                                     <label class="role-option">
-                                        <input type="radio" name="rol" value="vender" required>
+                                        <input type="radio" name="ROL" value="vender" required>
                                         <div class="role-text"><strong>Tengo implementos para vender</strong><span>Terminé ramos y tengo cosas guardadas sin usar</span></div>
                                     </label>
                                     <label class="role-option">
-                                        <input type="radio" name="rol" value="comprar">
+                                        <input type="radio" name="ROL" value="comprar">
                                         <div class="role-text"><strong>Busco comprar más barato</strong><span>Necesito libros, calculadora o materiales usados</span></div>
                                     </label>
                                     <label class="role-option">
-                                        <input type="radio" name="rol" value="ambos">
+                                        <input type="radio" name="ROL" value="ambos">
                                         <div class="role-text"><strong>Ambos (Vender y comprar)</strong><span>Quiero renovar mis cosas para el próximo semestre</span></div>
                                     </label>
                                 </div>
@@ -198,17 +200,17 @@
                                 <div class="field">
                                     <label class="field-label">¿Qué tienes guardado para vender? (Selecciona)</label>
                                     <div class="chips-grid">
-                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="calculadora"><span>Calculadora</span></label>
-                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="libros"><span>Libros / Guías</span></label>
-                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="maqueta"><span>Material Maqueta</span></label>
-                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="bata"><span>Bata / Lab</span></label>
-                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="electronica"><span>Cables / Tech</span></label>
-                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="otro"><span>Otro</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="ITEMS" value="calculadora"><span>Calculadora</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="ITEMS" value="libros"><span>Libros / Guías</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="ITEMS" value="maqueta"><span>Material Maqueta</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="ITEMS" value="bata"><span>Bata / Lab</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="ITEMS" value="electronica"><span>Cables / Tech</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="ITEMS" value="otro"><span>Otro</span></label>
                                     </div>
                                 </div>
                                 <div class="field">
                                     <label class="field-label" for="canal_actual">¿Dónde intentaste venderlos antes?</label>
-                                    <select id="canal_actual" name="canal_actual">
+                                    <select id="canal_actual" name="CANAL_ACTUAL">
                                         <option value="guardados">Aún no lo intento, siguen en mi pieza</option>
                                         <option value="instagram">Historias de Instagram</option>
                                         <option value="whatsapp">Grupos de WhatsApp</option>
@@ -218,7 +220,7 @@
                             </div>
 
                             <label class="early-check">
-                                <input type="checkbox" id="early_access" name="early_access" checked>
+                                <input type="checkbox" id="early_access" name="EARLY_ACCESS" checked>
                                 <span>Quiero participar en el piloto de prueba esta semana y tener acceso anticipado.</span>
                             </label>
 
@@ -343,7 +345,14 @@
     </div>
 
     <script>
-        const roleRadios = document.querySelectorAll('input[name="rol"]');
+        // ============================================================
+        // CONFIGURACIÓN: pega aquí la URL "action" que entrega Brevo
+        // al copiar el código de incrustación de tu formulario.
+        // Ejemplo: https://tu-cuenta.sibforms.com/serve/MUIF...
+        // ============================================================
+        const BREVO_FORM_ACTION = 'https://TU-CUENTA.sibforms.com/serve/MUIF...';
+
+        const roleRadios = document.querySelectorAll('input[name="ROL"]');
         const sellerPanel = document.getElementById('seller-panel');
         roleRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
@@ -361,34 +370,35 @@
             e.preventDefault();
 
             const formData = new FormData(form);
-            const items = Array.from(document.querySelectorAll('input[name="items"]:checked')).map(i => i.value);
-            const data = {
-                timestamp: new Date().toISOString(),
-                email: formData.get('email'),
-                carrera: formData.get('carrera'),
-                rol: formData.get('rol'),
-                tiene_algo_para_vender: ['vender', 'ambos'].includes(formData.get('rol')),
-                items: items,
-                canal_actual: formData.get('canal_actual') || 'N/A',
-                early_access: document.getElementById('early_access').checked
-            };
+            const rol = formData.get('ROL');
+            const items = Array.from(document.querySelectorAll('input[name="ITEMS"]:checked')).map(i => i.value);
+
+            // Resumen legible para el correo de administración (Brevo no personaliza con multiselección)
+            document.getElementById('detalle').value =
+                `Rol: ${rol} | Implementos: ${items.length ? items.join(', ') : 'ninguno'} | Canal anterior: ${formData.get('CANAL_ACTUAL') || 'N/A'}`;
 
             window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({ 'event': 'validacion_form_submit', 'rol_estudiante': data.rol, 'es_vendedor': data.tiene_algo_para_vender });
+            window.dataLayer.push({
+                'event': 'validacion_form_submit',
+                'rol_estudiante': rol,
+                'es_vendedor': ['vender', 'ambos'].includes(rol)
+            });
+
+            if (BREVO_FORM_ACTION.includes('TU-CUENTA')) {
+                formStatus.textContent = 'Falta configurar la URL de envío de Brevo en el archivo index.html (const BREVO_FORM_ACTION).';
+                return;
+            }
 
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
             formStatus.textContent = 'Enviando tu registro y correo de confirmación...';
 
             try {
-                const response = await fetch('/.netlify/functions/submit-form', {
+                await fetch(BREVO_FORM_ACTION, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: new FormData(form),
+                    mode: 'no-cors'
                 });
-
-                if (!response.ok) throw new Error('Error en el servidor');
-
                 formContainer.style.display = 'none';
                 successState.style.display = 'block';
             } catch (err) {

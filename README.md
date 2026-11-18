@@ -8,66 +8,108 @@ Landing de inicio + formulario de validación para el **Desafío 4: "Segunda man
 
 1. **Hero con el formulario grande y destacado** — es lo primero que se ve, porque es la pieza clave de validación.
 2. **Ejemplo de productos en venta** — tarjetas con nombre, precio, pequeña descripción, categoría, estado (`Disponible`/`Reservado`) y punto de entrega en el campus.
-3. **Integración con Brevo** — al enviar el formulario:
-   - Se envía un correo de **confirmación y agradecimiento** al estudiante.
-   - Se envía un correo de **aviso a administración** (`administracionollacomun@gmail.com`) con todos los datos del registro.
+3. **Integración 100% Brevo** — el formulario hace `POST` directo al endpoint de un formulario de Brevo. No hay Netlify ni servidor propio, y **la clave API no aparece en el código**.
 
-## El problema
+### Correos
 
-Cada semestre, cientos de estudiantes compran implementos que usarán unos meses (calculadoras científicas, libros de cálculo, batas de laboratorio, materiales de maqueta). Al terminar el ramo quedan guardados. Hoy la compraventa ocurre en grupos de Instagram y WhatsApp donde las publicaciones se pierden en horas, no se sabe si el producto sigue disponible y nadie confía en pagar por adelantado.
-
-## El MVP
-
-Landing estática + una Netlify Function que envía los correos. Cumple la restricción de "MVP sin programar" en el sentido de que no hay base de datos ni backend propio: solo una función serverless gratuita para usar la API de Brevo de forma segura.
-
-> **Seguridad:** la clave API de Brevo **nunca** está en el código. Se lee de la variable de entorno `BREVO_API_KEY` en Netlify.
+| Destinatario | Quién lo envía | Cómo |
+| --- | --- | --- |
+| Correo del estudiante | Brevo | **Confirmación simple** configurada en el formulario (plantilla de agradecimiento). |
+| `administracionollacomun@gmail.com` | Brevo | **Automatización** disparada por el envío del formulario → acción *Notify by email*. |
 
 ## Estructura
 
 ```
 .
-├── index.html                         # Landing + catálogo de ejemplo + formulario
-├── netlify.toml                       # Configuración de publicación y funciones
-├── netlify/functions/submit-form.js   # Endpoint que envía los 2 correos vía Brevo
-└── README.md                          # Este archivo
+├── index.html   # Landing + catálogo de ejemplo + formulario (POST a Brevo)
+├── README.md    # Este archivo y las instrucciones de configuración
+└── .gitignore
 ```
 
-## Configuración (importante)
+## Configuración en Brevo (paso a paso)
 
-El formulario llama a `/.netlify/functions/submit-form`, que solo funciona cuando el sitio está desplegado en **Netlify** (GitHub Pages no ejecuta funciones).
+### 1. Verificar el remitente
 
-### Pasos
+En Brevo: **Settings → Senders & Domains (Remitentes y dominios)**. Confirma que `administracionollacomun@gmail.com` aparece como remitente verificado. Si no está, Brevo rechazará los correos.
 
-1. Crear una cuenta en [Netlify](https://www.netlify.com/) y conectar el repo `joaqalmonacid-star/PersaUDD`.
-2. En Netlify: **Site settings → Environment variables → Add variable**:
-   - `BREVO_API_KEY` = tu clave API de Brevo (la que empieza con `xkeysib-...`).
-3. Configuración del build (ya viene en `netlify.toml`):
-   - Publish directory: `.` (raíz)
-   - Functions directory: `netlify/functions`
-4. Hacer deploy. Cada push a `main` actualiza el sitio automáticamente.
+### 2. Crear los atributos de contacto
 
-### Verificar el remitente en Brevo
+En **Contacts → Contact attributes (Atributos de contacto)** crea estos campos si no existen (todos en mayúsculas, tal cual):
 
-Brevo solo envía desde remitentes verificados. Confirma en **Settings → Senders & Domains** que `administracionollacomun@gmail.com` esté validado como remitente. Si no, los correos pueden ser rechazados con un error 400/401.
-
-### Prueba local (opcional)
-
-Con [Netlify CLI](https://docs.netlify.com/cli/get-started/):
-
-```bash
-npm install -g netlify-cli
-netlify link      # conecta con tu sitio de Netlify para tomar las variables de entorno
-netlify dev
-```
-
-Luego abre `http://localhost:8888` y envía el formulario.
-
-## Correos que envía la función
-
-| Destinatario | Asunto | Contenido |
+| Atributo | Tipo | Uso |
 | --- | --- | --- |
-| Correo del estudiante | `¡Gracias por tu interés en CampusSwap! 🎉` | Agradecimiento y aviso de que se escribirá al habilitar la carga de productos. |
-| `administracionollacomun@gmail.com` | `Nuevo registro CampusSwap · {carrera}` | Correo, carrera, rol, implementos, canal anterior, acceso anticipado y fecha. |
+| `CARRERA` | Texto | Carrera del estudiante |
+| `ROL` | Texto | `vender`, `comprar` o `ambos` |
+| `ITEMS` | Selección múltiple | Implementos que tiene para vender |
+| `DETALLE` | Texto larga | Resumen legible para el correo de administración |
+| `CANAL_ACTUAL` | Texto | Dónde intentó vender antes |
+| `EARLY_ACCESS` | Texto | `true` / `false` |
+
+> `EMAIL` ya existe por defecto en Brevo.
+
+### 3. Crear el formulario en Brevo
+
+1. **Marketing → Forms → Create sign-up form → Full page/embedded**.
+2. Nómbralo, por ejemplo: `CampusSwap · Acceso anticipado`.
+3. En el constructor, agrega los campos con sus atributos (`EMAIL`, `CARRERA`, `ROL`, `ITEMS`, `DETALLE`, `CANAL_ACTUAL`, `EARLY_ACCESS`). Puedes ocultar `DETALLE` si el editor lo permite; el formulario de la web ya lo rellena automáticamente.
+4. Asocia una lista, por ejemplo: `CampusSwap - Lista fundadora`.
+5. En **Settings**, elige **Simple confirmation email** (confirmación simple) y selecciona una plantilla de agradecimiento (paso 4). Así el estudiante recibe el correo apenas envía, sin doble opt-in.
+6. En **Share / Embed**, copia el código **HTML** (o *Simple HTML*) y busca dentro la URL del `action`, parecida a:
+   ```
+   https://tu-cuenta.sibforms.com/serve/MUIF...
+   ```
+7. Pega esa URL en `index.html`, reemplazando el valor de:
+   ```js
+   const BREVO_FORM_ACTION = 'https://TU-CUENTA.sibforms.com/serve/MUIF...';
+   ```
+
+> No copies todo el embed: nuestra página ya tiene su propio diseño. Solo necesitamos la URL de envío. Los nombres de los campos de nuestro formulario ya coinciden con los atributos de Brevo.
+
+### 4. Plantilla de confirmación para el estudiante
+
+En **Marketing → Templates → Email**, crea una plantilla (p. ej. `CampusSwap - Gracias por tu interés`) con este contenido:
+
+**Asunto:** `¡Gracias por tu interés en CampusSwap! 🎉`
+
+**Cuerpo:**
+```html
+<h1>¡Gracias por sumarte! 🙌</h1>
+<p>Recibimos tu registro para el piloto de <strong>CampusSwap</strong>, el mercado de segunda mano dentro del campus UDD.</p>
+<p>Te escribiremos al correo apenas habilitemos la carga de productos esta semana.</p>
+<p>Mientras tanto, recuerda: <strong>sin pagos en la app, trato directo en el campus y 0% comisión.</strong></p>
+<p>CampusSwap · Piloto Fin de Semestre · UDD</p>
+```
+
+Luego selecciónala en los ajustes del formulario (paso 3.5).
+
+### 5. Aviso a administración (automatización)
+
+1. Agrega `administracionollacomun@gmail.com` como contacto en Brevo (**Contacts → Add a contact**). El paso *Notify by email* solo puede notificar a contactos existentes.
+2. **Automations → Workflows → Create an automation → desde cero**.
+3. **Trigger:** arrastra *Forms - Form submitted* y selecciona el formulario `CampusSwap · Acceso anticipado`.
+4. **Action:** arrastra *Messaging - Notify by email*.
+5. Configura:
+   - **From:** el remitente verificado (`administracionollacomun@gmail.com`).
+   - **Who do you want to notify?:** *One or more contacts* → `administracionollacomun@gmail.com`.
+   - **Asunto:** `Nuevo registro CampusSwap · {{params.contact.CARRERA}}`
+   - **Cuerpo:**
+     ```text
+     Nuevo registro de acceso anticipado en CampusSwap:
+
+     Correo: {{params.contact.EMAIL}}
+     Carrera: {{params.contact.CARRERA}}
+     Rol: {{params.contact.ROL}}
+     Detalle: {{params.contact.DETALLE}}
+     Acceso anticipado: {{params.contact.EARLY_ACCESS}}
+
+     Fecha: {{params.contact.DETALLE}}
+     ```
+     > En la sección *What event data to display* deja seleccionado **The email doesn't have variables**, tal como indica Brevo para este tipo de notificación.
+6. Guarda, activa la automatización y (recomendado) activa **Allow contact re-entry after exit**.
+
+### 6. Publicar
+
+Ahora es un sitio estático: funciona en **GitHub Pages**, en cualquier hosting o abriendo `index.html`. No necesitas Netlify ni variables de entorno.
 
 ## Restricciones del desafío cubiertas
 
@@ -76,13 +118,11 @@ Luego abre `http://localhost:8888` y envía el formulario.
 | Solo entre estudiantes de la universidad | Se pide correo institucional y carrera. |
 | Sin pagos en línea en el MVP | Copy explícito: "Sin pagos en la app · Trato directo en el campus · 0% comisión". |
 | No se permiten productos prohibidos | El catálogo de ejemplo solo muestra implementos académicos. |
-| Debe probarse a fin de semestre, cuando hay poca demanda | El hero enfocado en "vender antes de irte de vacaciones" y la medición de oferta acumulada. |
-| Sin costo / planes gratuitos | Netlify y Brevo tienen planes gratuitos suficientes para el piloto. |
+| Debe probarse a fin de semestre, cuando hay poca demanda | Hero enfocado en "vender antes de irte de vacaciones" y medición de oferta acumulada. |
+| Sin costo / planes gratuitos | Brevo y GitHub Pages tienen planes gratuitos suficientes para el piloto. |
 | Sin datos sensibles | No se piden RUT, contraseñas, ClaveÚnica, datos bancarios ni de salud. |
 
 ## Evidencia esperada (métricas)
-
-La ficha pide: **productos publicados, intercambios concretados y tiempo entre la publicación y la venta**. En esta fase se miden estos proxies:
 
 | Métrica de comportamiento | Umbral de éxito (propuesto, confirmar antes de probar) |
 | --- | --- |
@@ -91,12 +131,16 @@ La ficha pide: **productos publicados, intercambios concretados y tiempo entre l
 | Registros que marcan "Quiero acceso anticipado" | ≥ 50% |
 | Carreras distintas representadas | ≥ 3 |
 
+## Seguridad
+
+La clave API que se compartió en la conversación **no se usa ni se guarda en este repositorio**. Como ya fue expuesta, se recomienda **rotarla en Brevo** (*Settings → API keys → Generate new key*) aunque ya no sea necesaria para este proyecto.
+
 ## Estado
 
 - [x] Landing de inicio con catálogo de ejemplo (nombre, precio, descripción, estado y entrega).
 - [x] Formulario grande y destacado en el hero.
-- [x] Envío vía Brevo (confirmación al estudiante + aviso a administración).
-- [x] Clave API protegida como variable de entorno.
+- [x] Envío directo a Brevo sin Netlify ni clave en el frontend.
+- [ ] Crear formulario en Brevo y pegar su URL `action` en `index.html`.
+- [ ] Configurar plantilla de confirmación y automatización al correo de administración.
 - [ ] Nombre y logo definitivos.
-- [ ] Conectar Netlify y configurar `BREVO_API_KEY`.
 - [ ] Pruebas con estudiantes reales y medición de umbrales.

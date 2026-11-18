@@ -81,8 +81,26 @@ Cada push a `main` dispara el workflow y actualiza el sitio automáticamente.
 - [x] Clave como secreto de GitHub + deploy automático en Pages.
 - [x] Nombre definitivo: OllaComun.
 - [x] Imágenes reales de los productos con licencia libre.
-- [ ] Logo definitivo.
+- [x] Logo MECO integrado (navbar y favicon).
+- [x] Paleta de colores oficial aplicada.
 - [ ] Pruebas con estudiantes reales y medición de umbrales.
+
+## Identidad visual
+
+- **Logo:** `images/meco_logo.png` (MECO), usado en el navbar y como favicon.
+- **Paleta oficial** (`Paleta de colores.txt`), aplicada en `:root` de `index.html`:
+
+| Color | Hex | Uso en la página |
+| --- | --- | --- |
+| Blanco | `#ffffff` | Fondo y superficies |
+| Azul marino | `#00295b` | Primario: títulos, botones, bordes, logo |
+| Negro | `#000000` | Texto |
+| Azul noche | `#000027` | Texto principal |
+| Rojo | `#ed1c24` | Acento: hover del CTA, etiquetas, estados de envío |
+| Verde | `#005f02` | Disponible y éxito |
+| Celeste | `#29abe2` | Foco de campos y panel de vendedores |
+| Amarillo | `#fcee21` | Estado "Reservado" |
+| Verde oscuro | `#0d280e` | Refuerzo de la paleta |
 
 ## Créditos de las imágenes
 

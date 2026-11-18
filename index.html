@@ -5,23 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="OllaComun · Compra y vende libros, calculadoras e implementos usados entre estudiantes de la UDD.">
     <title>OllaComun · Compra y vende implementos en tu U</title>
+    <link rel="icon" type="image/png" href="images/meco_logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #fafafa;
-            --surface: #ffffff;
-            --text-main: #09090b;
-            --text-muted: #52525b;
-            --primary: #18181b;
-            --accent: #2563eb;
-            --accent-soft: #eff6ff;
-            --border: #e4e4e7;
-            --emerald: #059669;
-            --emerald-soft: #ecfdf5;
-            --amber: #d97706;
-            --amber-soft: #fffbeb;
+            /* Paleta oficial OllaComun / MECO */
+            --white: #ffffff;
+            --navy: #00295b;
+            --black: #000000;
+            --ink: #000027;
+            --red: #ed1c24;
+            --green: #005f02;
+            --cyan: #29abe2;
+            --yellow: #fcee21;
+            --dark-green: #0d280e;
+
+            --bg: var(--white);
+            --surface: var(--white);
+            --text-main: var(--ink);
+            --text-muted: rgba(0, 41, 91, 0.72);
+            --primary: var(--navy);
+            --accent: var(--red);
+            --accent-soft: rgba(237, 28, 36, 0.08);
+            --border: rgba(0, 41, 91, 0.16);
+            --emerald: var(--green);
+            --emerald-soft: rgba(0, 95, 2, 0.10);
+            --amber: var(--ink);
+            --amber-soft: var(--yellow);
             --radius-lg: 16px;
             --radius-md: 12px;
         }
@@ -33,7 +45,7 @@
             color: var(--text-main);
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
-            background-image: radial-gradient(#e4e4e7 1px, transparent 1px);
+            background-image: radial-gradient(rgba(0, 41, 91, 0.12) 1px, transparent 1px);
             background-size: 24px 24px;
         }
 
@@ -41,8 +53,8 @@
 
         /* Navbar */
         nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
-        .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; }
-        .logo-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; }
+        .logo { font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.6rem; color: var(--navy); }
+        .logo-img { width: 46px; height: 46px; object-fit: contain; display: block; }
         .campus-pill { font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.85rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
         .pulse { width: 7px; height: 7px; background: var(--emerald); border-radius: 50%; box-shadow: 0 0 0 3px var(--emerald-soft); }
 
@@ -64,7 +76,7 @@
         .hero-points li::before { content: '✓'; color: var(--emerald); font-weight: 800; }
 
         /* Tarjeta del formulario GRANDE */
-        .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1); }
+        .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: 0 20px 40px -12px rgba(0, 41, 91, 0.16); }
         .form-card-header { margin-bottom: 1.75rem; }
         .form-card-header h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
         .form-card-header p { font-size: 0.95rem; color: var(--text-muted); }
@@ -75,16 +87,16 @@
             width: 100%; padding: 0.9rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md);
             font-size: 1rem; color: var(--text-main); background: var(--surface); transition: all 0.15s ease;
         }
-        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+        input:focus, select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(41, 171, 226, 0.25); }
         .role-cards { display: flex; flex-direction: column; gap: 0.6rem; }
         .role-option { display: flex; align-items: flex-start; gap: 0.8rem; padding: 0.9rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s ease; }
-        .role-option:hover { border-color: #a1a1aa; }
+        .role-option:hover { border-color: rgba(0, 41, 91, 0.35); }
         .role-option:has(input:checked) { border-color: var(--accent); background-color: var(--accent-soft); }
         .role-option input[type="radio"] { margin-top: 0.25rem; accent-color: var(--accent); width: 1.05rem; height: 1.05rem; }
         .role-text strong { display: block; font-size: 0.95rem; font-weight: 700; }
         .role-text span { display: block; font-size: 0.82rem; color: var(--text-muted); }
 
-        #seller-panel { display: none; flex-direction: column; gap: 1.1rem; padding: 1.25rem; background: #f8fafc; border: 1px solid #dbeafe; border-radius: var(--radius-md); animation: fadeIn 0.25s ease; }
+        #seller-panel { display: none; flex-direction: column; gap: 1.1rem; padding: 1.25rem; background: rgba(41, 171, 226, 0.07); border: 1px solid rgba(41, 171, 226, 0.35); border-radius: var(--radius-md); animation: fadeIn 0.25s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .chips-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
         .chip-checkbox { cursor: pointer; }
@@ -99,7 +111,7 @@
         .btn-submit:disabled { opacity: 0.6; cursor: wait; }
         .trust-note { text-align: center; font-size: 0.8rem; color: var(--text-muted); transition: color 0.15s ease; }
         #form-status.is-sending { color: var(--accent); font-weight: 700; }
-        #form-status.is-error { color: #dc2626; font-weight: 700; }
+        #form-status.is-error { color: var(--red); font-weight: 700; }
         #form-status.is-success { color: var(--emerald); font-weight: 700; }
 
         #success-state { display: none; text-align: center; padding: 1.5rem 0.5rem; animation: fadeIn 0.3s ease; }
@@ -115,7 +127,7 @@
         .section-head h2 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; }
         .section-head p { font-size: 0.95rem; color: var(--text-muted); }
         .filter-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-        .pill { font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.7rem; border-radius: 6px; background: #f4f4f5; color: var(--text-muted); }
+        .pill { font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.7rem; border-radius: 6px; background: rgba(0, 41, 91, 0.06); color: var(--text-muted); }
         .pill.active { background: var(--primary); color: white; }
 
         .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
@@ -123,8 +135,8 @@
         @media (max-width: 600px) { .product-grid { grid-template-columns: 1fr; } }
 
         .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 30px -12px rgba(0, 0, 0, 0.12); }
-        .product-thumb { width: 100%; height: 180px; display: block; object-fit: cover; background: linear-gradient(135deg, #eff6ff, #fafafa); border-bottom: 1px solid var(--border); }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 30px -12px rgba(0, 41, 91, 0.20); }
+        .product-thumb { width: 100%; height: 180px; display: block; object-fit: cover; background: linear-gradient(135deg, rgba(41, 171, 226, 0.18), var(--white)); border-bottom: 1px solid var(--border); }
         .product-body { padding: 1.15rem 1.25rem 1.25rem; }
         .product-cat { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); }
         .product-name { font-size: 1rem; font-weight: 800; margin: 0.35rem 0 0.4rem; line-height: 1.25; }
@@ -143,7 +155,7 @@
 
     <div class="container">
         <nav>
-            <div class="logo"><span class="logo-dot"></span> OllaComun</div>
+            <div class="logo"><img src="images/meco_logo.png" alt="Logo OllaComun" class="logo-img"> OllaComun</div>
             <div class="campus-pill"><span class="pulse"></span> Piloto Fin de Semestre · UDD</div>
         </nav>
 
@@ -451,13 +463,13 @@
                     to: [{ email: email }],
                     subject: '¡Gracias por tu interés en OllaComun! 🎉',
                     htmlContent: `
-                        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#18181b">
+                        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#000027">
                             <h1 style="font-size:24px">¡Gracias por sumarte! 🙌</h1>
                             <p>Recibimos tu registro para el piloto de <strong>OllaComun</strong>, el mercado de segunda mano dentro del campus UDD.</p>
                             <p>Te escribiremos al correo apenas habilitemos la carga de productos esta semana.</p>
                             <p>Mientras tanto, recuerda: <strong>sin pagos en la app, trato directo en el campus y 0% comisión.</strong></p>
-                            <hr style="border:none;border-top:1px solid #e4e4e7;margin:24px 0">
-                            <p style="font-size:12px;color:#52525b">OllaComun · Piloto Fin de Semestre · UDD</p>
+                            <hr style="border:none;border-top:1px solid #00295b33;margin:24px 0">
+                            <p style="font-size:12px;color:#00295b">OllaComun · Piloto Fin de Semestre · UDD</p>
                         </div>`
                 });
 
@@ -468,7 +480,7 @@
                     replyTo: { email: email },
                     subject: `Nuevo registro OllaComun · ${carrera}`,
                     htmlContent: `
-                        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#18181b">
+                        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#000027">
                             <h1 style="font-size:20px">Nuevo registro de acceso anticipado</h1>
                             <table style="width:100%;border-collapse:collapse;font-size:14px">
                                 <tr><td style="padding:8px 0;font-weight:bold">Correo:</td><td>${escapeHtml(email)}</td></tr>

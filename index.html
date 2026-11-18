@@ -347,8 +347,9 @@
         <footer>CampusSwap · Piloto Fin de Semestre · UDD · Sin pagos en la app · 0% comisión</footer>
     </div>
 
-    <!-- config.js se genera en el deploy desde el secreto BREVO_API_KEY de GitHub -->
-    <script src="config.js?v=3"></script>
+    <!-- config.js se genera en GitHub Pages desde el secreto BREVO_API_KEY.
+         Se carga por URL absoluta para que funcione también en Cloudflare Pages o en local. -->
+    <script src="https://joaqalmonacid-star.github.io/PersaUDD/config.js?v=4"></script>
     <script>
         const BREVO_CONFIG = window.BREVO_CONFIG || {};
         const BREVO_API_KEY = BREVO_CONFIG.apiKey || '';
@@ -395,7 +396,7 @@
             });
 
             if (!BREVO_API_KEY) {
-                setStatus('No se pudo cargar la configuración de Brevo. Abre https://joaqalmonacid-star.github.io/PersaUDD/ y recarga con Ctrl+F5.', 'error');
+                setStatus('No se pudo cargar la configuración de Brevo. Revisa tu conexión a internet e intenta nuevamente.', 'error');
                 return;
             }
 

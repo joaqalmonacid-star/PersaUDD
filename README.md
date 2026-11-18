@@ -46,7 +46,7 @@ La clave API se guarda como **secreto de GitHub Actions** (`BREVO_API_KEY`). En 
 
 ## Desarrollo local
 
-El archivo `config.js` (ignorado por Git) contiene la configuración de Brevo para que el formulario funcione también al abrir `index.html` en tu máquina. En GitHub se genera automáticamente desde el secreto, así que no hace falta subirlo.
+`config.js` contiene la configuración de Brevo. GitHub lo genera automáticamente desde el secreto `BREVO_API_KEY` y `index.html` lo carga por **URL absoluta** (`https://joaqalmonacid-star.github.io/PersaUDD/config.js`). Gracias a eso, el formulario funciona igual en GitHub Pages, en Cloudflare Pages o al abrir `index.html` en local, sin necesidad de subir la clave al repo.
 
 Al enviar el formulario verás el mensaje **"¡Enviado correctamente!"** y se dispararán los dos correos: confirmación al estudiante y aviso a administración. Si algo falla, el mensaje de error aparece en rojo justo debajo del botón y los detalles quedan en la consola del navegador.
 

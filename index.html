@@ -17,22 +17,16 @@
             --primary: #18181b;
             --accent: #2563eb;
             --accent-soft: #eff6ff;
-            --accent-hover: #1d4ed8;
+            --border: #e4e4e7;
             --emerald: #059669;
             --emerald-soft: #ecfdf5;
             --amber: #d97706;
             --amber-soft: #fffbeb;
-            --border: #e4e4e7;
             --radius-lg: 16px;
             --radius-md: 12px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
 
         body {
             background-color: var(--bg);
@@ -43,718 +37,371 @@
             background-size: 24px 24px;
         }
 
-        .container {
-            max-width: 1080px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem 5rem;
-        }
+        .container { max-width: 1080px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
 
-        /* Navbar minimalista */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3.5rem;
-        }
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+        .logo { font-weight: 800; font-size: 1.25rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; }
+        .logo-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block; }
+        .campus-pill { font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.85rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
+        .pulse { width: 7px; height: 7px; background: var(--emerald); border-radius: 50%; box-shadow: 0 0 0 3px var(--emerald-soft); }
 
-        .logo {
-            font-weight: 800;
-            font-size: 1.25rem;
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo-dot {
-            width: 10px;
-            height: 10px;
-            background: var(--accent);
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .campus-pill {
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 0.35rem 0.85rem;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .pulse {
-            width: 7px;
-            height: 7px;
-            background: var(--emerald);
-            border-radius: 50%;
-            box-shadow: 0 0 0 3px var(--emerald-soft);
-        }
-
-        /* Grid Principal: Propuesta + Preview vs Formulario */
-        .hero-grid {
+        /* HERO + FORMULARIO (lo primero que se ve) */
+        .hero {
             display: grid;
-            grid-template-columns: 1.1fr 0.95fr;
-            gap: 3.5rem;
-            align-items: start;
-        }
-
-        @media (max-width: 900px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                gap: 2.5rem;
-            }
-        }
-
-        /* Columna Izquierda */
-        .eyebrow {
-            display: inline-block;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--accent);
-            background: var(--accent-soft);
-            padding: 0.35rem 0.75rem;
-            border-radius: 6px;
-            margin-bottom: 1.25rem;
-        }
-
-        h1 {
-            font-size: clamp(2.1rem, 4vw, 2.85rem);
-            font-weight: 800;
-            letter-spacing: -0.035em;
-            line-height: 1.12;
-            margin-bottom: 1.25rem;
-            color: var(--text-main);
-        }
-
-        .lead {
-            font-size: 1.08rem;
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            max-width: 52ch;
-        }
-
-        /* Preview visual del MVP (MoSCoW: Filtros + Estados de venta) */
-        .mvp-preview {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
+            grid-template-columns: 1fr 1.05fr;
+            gap: 3rem;
             align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border);
+            margin-bottom: 4rem;
         }
+        @media (max-width: 900px) { .hero { grid-template-columns: 1fr; gap: 2.5rem; } }
 
-        .preview-title {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
+        .eyebrow { display: inline-block; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); background: var(--accent-soft); padding: 0.35rem 0.75rem; border-radius: 6px; margin-bottom: 1.25rem; }
+        h1 { font-size: clamp(2.4rem, 5vw, 3.4rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 1.25rem; }
+        .lead { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 1.5rem; max-width: 50ch; }
+        .hero-points { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 0; }
+        .hero-points li { display: flex; align-items: flex-start; gap: 0.6rem; font-size: 0.95rem; color: var(--text-muted); }
+        .hero-points li::before { content: '✓'; color: var(--emerald); font-weight: 800; }
 
-        .filter-pills {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
+        /* Tarjeta del formulario GRANDE */
+        .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.25rem; box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.1); }
+        .form-card-header { margin-bottom: 1.75rem; }
+        .form-card-header h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.4rem; }
+        .form-card-header p { font-size: 0.95rem; color: var(--text-muted); }
+        form { display: flex; flex-direction: column; gap: 1.35rem; }
+        .field { display: flex; flex-direction: column; gap: 0.5rem; }
+        label.field-label { font-size: 0.9rem; font-weight: 700; color: var(--text-main); }
+        input[type="text"], input[type="email"], select {
+            width: 100%; padding: 0.9rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+            font-size: 1rem; color: var(--text-main); background: var(--surface); transition: all 0.15s ease;
         }
+        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12); }
+        .role-cards { display: flex; flex-direction: column; gap: 0.6rem; }
+        .role-option { display: flex; align-items: flex-start; gap: 0.8rem; padding: 0.9rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s ease; }
+        .role-option:hover { border-color: #a1a1aa; }
+        .role-option:has(input:checked) { border-color: var(--accent); background-color: var(--accent-soft); }
+        .role-option input[type="radio"] { margin-top: 0.25rem; accent-color: var(--accent); width: 1.05rem; height: 1.05rem; }
+        .role-text strong { display: block; font-size: 0.95rem; font-weight: 700; }
+        .role-text span { display: block; font-size: 0.82rem; color: var(--text-muted); }
 
-        .pill {
-            font-size: 0.72rem;
-            font-weight: 600;
-            padding: 0.25rem 0.6rem;
-            border-radius: 6px;
-            background: #f4f4f5;
-            color: var(--text-muted);
-        }
+        #seller-panel { display: none; flex-direction: column; gap: 1.1rem; padding: 1.25rem; background: #f8fafc; border: 1px solid #dbeafe; border-radius: var(--radius-md); animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        .chips-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .chip-checkbox { cursor: pointer; }
+        .chip-checkbox input { display: none; }
+        .chip-checkbox span { display: inline-block; font-size: 0.82rem; font-weight: 600; padding: 0.45rem 0.8rem; border-radius: 999px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-muted); transition: all 0.15s ease; user-select: none; }
+        .chip-checkbox input:checked + span { border-color: var(--accent); background: var(--accent); color: white; }
+        .early-check { display: flex; align-items: flex-start; gap: 0.65rem; font-size: 0.88rem; color: var(--text-muted); cursor: pointer; }
+        .early-check input { margin-top: 0.2rem; accent-color: var(--accent); width: 1.05rem; height: 1.05rem; }
+        .btn-submit { width: 100%; padding: 1.1rem 1.25rem; background: var(--primary); color: white; font-size: 1.02rem; font-weight: 700; border: none; border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s ease, transform 0.1s ease; display: flex; justify-content: center; align-items: center; gap: 0.5rem; }
+        .btn-submit:hover { background: var(--accent); }
+        .btn-submit:active { transform: scale(0.99); }
+        .btn-submit:disabled { opacity: 0.6; cursor: wait; }
+        .trust-note { text-align: center; font-size: 0.8rem; color: var(--text-muted); }
 
-        .pill.active {
-            background: var(--primary);
-            color: white;
-        }
+        #success-state { display: none; text-align: center; padding: 1.5rem 0.5rem; animation: fadeIn 0.3s ease; }
+        .success-icon { width: 56px; height: 56px; background: var(--emerald-soft); color: var(--emerald); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.6rem; font-weight: 800; }
+        #success-state h3 { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem; }
+        #success-state p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+        .btn-share { display: inline-block; padding: 0.75rem 1.2rem; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 700; color: var(--text-main); cursor: pointer; transition: border-color 0.15s; }
+        .btn-share:hover { border-color: var(--text-main); }
 
-        .mock-items {
-            display: flex;
-            flex-direction: column;
-            gap: 0.65rem;
-        }
+        /* SECCIÓN DE PRODUCTOS DE EJEMPLO */
+        .catalogo { margin-top: 1rem; }
+        .section-head { display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
+        .section-head h2 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; }
+        .section-head p { font-size: 0.95rem; color: var(--text-muted); }
+        .filter-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .pill { font-size: 0.75rem; font-weight: 600; padding: 0.35rem 0.7rem; border-radius: 6px; background: #f4f4f5; color: var(--text-muted); }
+        .pill.active { background: var(--primary); color: white; }
 
-        .mock-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0.9rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            background: #fcfcfd;
-        }
+        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+        @media (max-width: 900px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .product-grid { grid-template-columns: 1fr; } }
 
-        .mock-info strong {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
+        .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 30px -12px rgba(0, 0, 0, 0.12); }
+        .product-thumb { height: 150px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; background: linear-gradient(135deg, #eff6ff, #fafafa); }
+        .product-body { padding: 1.15rem 1.25rem 1.25rem; }
+        .product-cat { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); }
+        .product-name { font-size: 1rem; font-weight: 800; margin: 0.35rem 0 0.4rem; line-height: 1.25; }
+        .product-desc { font-size: 0.84rem; color: var(--text-muted); min-height: 2.4em; margin-bottom: 0.9rem; }
+        .product-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 0.85rem; gap: 0.5rem; }
+        .product-price { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+        .status-badge { font-size: 0.68rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 999px; white-space: nowrap; }
+        .status-available { background: var(--emerald-soft); color: var(--emerald); }
+        .status-reserved { background: var(--amber-soft); color: var(--amber); }
+        .product-place { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.6rem; }
 
-        .mock-info span {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-
-        .mock-meta {
-            text-align: right;
-        }
-
-        .price {
-            display: block;
-            font-weight: 800;
-            font-size: 0.92rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .status-badge {
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 0.2rem 0.55rem;
-            border-radius: 999px;
-            display: inline-block;
-        }
-
-        .status-available {
-            background: var(--emerald-soft);
-            color: var(--emerald);
-        }
-
-        .status-reserved {
-            background: var(--amber-soft);
-            color: var(--amber);
-        }
-
-        /* Beneficios clave sin cajas pesadas */
-        .benefits {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.25rem;
-        }
-
-        @media (max-width: 520px) {
-            .benefits {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .benefit-item h3 {
-            font-size: 0.95rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-        }
-
-        .benefit-item p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* Columna Derecha: Tarjeta de Formulario */
-        .form-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 2rem;
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.06);
-        }
-
-        .form-card-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-card-header h2 {
-            font-size: 1.35rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.35rem;
-        }
-
-        .form-card-header p {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.45rem;
-        }
-
-        label.field-label {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        input[type="text"],
-        input[type="email"],
-        select {
-            width: 100%;
-            padding: 0.75rem 0.9rem;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 0.92rem;
-            color: var(--text-main);
-            background: var(--surface);
-            transition: all 0.15s ease;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
-
-        /* Opciones de Rol interactivas */
-        .role-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 0.55rem;
-        }
-
-        .role-option {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            padding: 0.8rem 0.95rem;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .role-option:hover {
-            border-color: #a1a1aa;
-        }
-
-        .role-option:has(input:checked) {
-            border-color: var(--accent);
-            background-color: var(--accent-soft);
-        }
-
-        .role-option input[type="radio"] {
-            margin-top: 0.2rem;
-            accent-color: var(--accent);
-        }
-
-        .role-text strong {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .role-text span {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* Bloque Condicional Vendedor */
-        #seller-panel {
-            display: none;
-            flex-direction: column;
-            gap: 1rem;
-            padding: 1.15rem;
-            background: #f8fafc;
-            border: 1px solid #dbeafe;
-            border-radius: var(--radius-md);
-            animation: fadeIn 0.25s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .chips-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.45rem;
-        }
-
-        .chip-checkbox {
-            cursor: pointer;
-        }
-
-        .chip-checkbox input {
-            display: none;
-        }
-
-        .chip-checkbox span {
-            display: inline-block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0.4rem 0.75rem;
-            border-radius: 999px;
-            border: 1.5px solid var(--border);
-            background: var(--surface);
-            color: var(--text-muted);
-            transition: all 0.15s ease;
-            user-select: none;
-        }
-
-        .chip-checkbox input:checked + span {
-            border-color: var(--accent);
-            background: var(--accent);
-            color: white;
-        }
-
-        .early-check {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.6rem;
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .early-check input {
-            margin-top: 0.15rem;
-            accent-color: var(--accent);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 0.95rem 1.25rem;
-            background: var(--primary);
-            color: white;
-            font-size: 0.95rem;
-            font-weight: 700;
-            border: none;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: background 0.15s ease, transform 0.1s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-submit:hover {
-            background: var(--accent);
-        }
-
-        .btn-submit:active {
-            transform: scale(0.99);
-        }
-
-        .trust-note {
-            text-align: center;
-            font-size: 0.76rem;
-            color: var(--text-muted);
-        }
-
-        /* Estado de Éxito */
-        #success-state {
-            display: none;
-            text-align: center;
-            padding: 1.5rem 0.5rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .success-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--emerald-soft);
-            color: var(--emerald);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.4rem;
-            font-weight: 800;
-        }
-
-        #success-state h3 {
-            font-size: 1.35rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-        }
-
-        #success-state p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            margin-bottom: 1.25rem;
-        }
-
-        .btn-share {
-            display: inline-block;
-            padding: 0.65rem 1.1rem;
-            background: var(--surface);
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-main);
-            cursor: pointer;
-            transition: border-color 0.15s;
-        }
-
-        .btn-share:hover {
-            border-color: var(--text-main);
-        }
+        footer { text-align: center; margin-top: 4rem; font-size: 0.8rem; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
     <div class="container">
         <nav>
-            <div class="logo">
-                <span class="logo-dot"></span> CampusSwap
-            </div>
-            <div class="campus-pill">
-                <span class="pulse"></span> Piloto Fin de Semestre · UDD
-            </div>
+            <div class="logo"><span class="logo-dot"></span> CampusSwap</div>
+            <div class="campus-pill"><span class="pulse"></span> Piloto Fin de Semestre · UDD</div>
         </nav>
 
-        <main class="hero-grid">
-            <!-- Columna Izquierda: Propuesta de valor + Vista previa del MVP -->
-            <div>
-                <span class="eyebrow">Mercado Estudiantil Verificado</span>
-                <h1>Vende tus cosas de ramo antes de irte de vacaciones.</h1>
-                <p class="lead">
-                    Olvídate de subir historias que nadie ve o responder veinte veces "¿sigue disponible?". Publica en segundos y entrega entre clases dentro del campus.
-                </p>
-
-                <!-- Mockup funcional de los MUST del MoSCoW -->
-                <div class="mvp-preview">
-                    <div class="preview-header">
-                        <span class="preview-title">Así se verá el catálogo</span>
-                        <div class="filter-pills">
-                            <span class="pill active">Todos</span>
-                            <span class="pill">Arquitectura</span>
-                            <span class="pill">Ingeniería</span>
-                            <span class="pill">Salud</span>
-                        </div>
-                    </div>
-                    <div class="mock-items">
-                        <div class="mock-card">
-                            <div class="mock-info">
-                                <strong>Calculadora Científica Casio fx-991</strong>
-                                <span>Cálculo I · Entrega en Patio Central</span>
-                            </div>
-                            <div class="mock-meta">
-                                <span class="price">$12.000</span>
-                                <span class="status-badge status-available">● Disponible</span>
-                            </div>
-                        </div>
-                        <div class="mock-card">
-                            <div class="mock-info">
-                                <strong>Set Reglas Escala + Bisturí Maqueta</strong>
-                                <span>Taller Arquitectura · Poco uso</span>
-                            </div>
-                            <div class="mock-meta">
-                                <span class="price">$8.500</span>
-                                <span class="status-badge status-reserved">◐ Reservado</span>
-                            </div>
-                        </div>
-                    </div>
+        <main>
+            <!-- HERO: propuesta de valor + FORMULARIO GRANDE -->
+            <section class="hero">
+                <div>
+                    <span class="eyebrow">Mercado Estudiantil Verificado</span>
+                    <h1>Vende tus cosas de ramo antes de irte de vacaciones.</h1>
+                    <p class="lead">Olvídate de subir historias que nadie ve o responder veinte veces "¿sigue disponible?". Publica en segundos y entrega entre clases dentro del campus.</p>
+                    <ul class="hero-points">
+                        <li>🔒 100% comunidad UDD con correo institucional.</li>
+                        <li>⚡ Estado en tiempo real: disponible o reservado.</li>
+                        <li>🤝 Trato directo en el campus, sin pagos en la app ni comisión.</li>
+                    </ul>
                 </div>
 
-                <div class="benefits">
-                    <div class="benefit-item">
-                        <h3>🔒 100% Comunidad UDD</h3>
-                        <p>Acceso exclusivo con correo institucional. Cero estafas ni cuentas falsas.</p>
-                    </div>
-                    <div class="benefit-item">
-                        <h3>⚡ Estado en tiempo real</h3>
-                        <p>Si alguien lo reserva, se marca al instante. Sin mensajes innecesarios.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Columna Derecha: Formulario de Validación -->
-            <div class="form-card">
-                <div id="form-container">
-                    <div class="form-card-header">
-                        <h2>Súmate al lanzamiento</h2>
-                        <p>Regístrate en 20 segundos para activar el intercambio en tu facultad.</p>
-                    </div>
-
-                    <form id="validation-form">
-                        <div class="field">
-                            <label class="field-label" for="email">Correo institucional</label>
-                            <input type="email" id="email" name="email" placeholder="tunombre@udd.cl" required>
+                <div class="form-card">
+                    <div id="form-container">
+                        <div class="form-card-header">
+                            <h2>Súmate al lanzamiento</h2>
+                            <p>Regístrate en 20 segundos para activar el intercambio en tu facultad. Te confirmaremos por correo.</p>
                         </div>
 
-                        <div class="field">
-                            <label class="field-label" for="carrera">Carrera</label>
-                            <input type="text" id="carrera" name="carrera" placeholder="Ej. Arquitectura, Ing. Comercial, Medicina..." required>
-                        </div>
-
-                        <div class="field">
-                            <label class="field-label">¿Qué te interesa hacer hoy?</label>
-                            <div class="role-cards">
-                                <label class="role-option">
-                                    <input type="radio" name="rol" value="vender" required>
-                                    <div class="role-text">
-                                        <strong>Tengo implementos para vender</strong>
-                                        <span>Terminé ramos y tengo cosas guardadas sin usar</span>
-                                    </div>
-                                </label>
-                                <label class="role-option">
-                                    <input type="radio" name="rol" value="comprar">
-                                    <div class="role-text">
-                                        <strong>Busco comprar más barato</strong>
-                                        <span>Necesito libros, calculadora o materiales usados</span>
-                                    </div>
-                                </label>
-                                <label class="role-option">
-                                    <input type="radio" name="rol" value="ambos">
-                                    <div class="role-text">
-                                        <strong>Ambos (Vender y comprar)</strong>
-                                        <span>Quiero renovar mis cosas para el próximo semestre</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Panel dinámico para medir oferta real (Meta: 1 de cada 5 estudiantes) -->
-                        <div id="seller-panel">
+                        <form id="validation-form">
                             <div class="field">
-                                <label class="field-label">¿Qué tienes guardado para vender? (Selecciona)</label>
-                                <div class="chips-grid">
-                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="calculadora"><span>Calculadora</span></label>
-                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="libros"><span>Libros / Guías</span></label>
-                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="maqueta"><span>Material Maqueta</span></label>
-                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="bata"><span>Bata / Lab</span></label>
-                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="electronica"><span>Cables / Tech</span></label>
-                                    <label class="chip-checkbox"><input type="checkbox" name="items" value="otro"><span>Otro</span></label>
+                                <label class="field-label" for="email">Correo institucional</label>
+                                <input type="email" id="email" name="email" placeholder="tunombre@udd.cl" required>
+                            </div>
+
+                            <div class="field">
+                                <label class="field-label" for="carrera">Carrera</label>
+                                <input type="text" id="carrera" name="carrera" placeholder="Ej. Arquitectura, Ing. Comercial, Medicina..." required>
+                            </div>
+
+                            <div class="field">
+                                <label class="field-label">¿Qué te interesa hacer hoy?</label>
+                                <div class="role-cards">
+                                    <label class="role-option">
+                                        <input type="radio" name="rol" value="vender" required>
+                                        <div class="role-text"><strong>Tengo implementos para vender</strong><span>Terminé ramos y tengo cosas guardadas sin usar</span></div>
+                                    </label>
+                                    <label class="role-option">
+                                        <input type="radio" name="rol" value="comprar">
+                                        <div class="role-text"><strong>Busco comprar más barato</strong><span>Necesito libros, calculadora o materiales usados</span></div>
+                                    </label>
+                                    <label class="role-option">
+                                        <input type="radio" name="rol" value="ambos">
+                                        <div class="role-text"><strong>Ambos (Vender y comprar)</strong><span>Quiero renovar mis cosas para el próximo semestre</span></div>
+                                    </label>
                                 </div>
                             </div>
 
-                            <div class="field">
-                                <label class="field-label" for="canal_actual">¿Dónde intentaste venderlos antes?</label>
-                                <select id="canal_actual" name="canal_actual">
-                                    <option value="guardados">Aún no lo intento, siguen en mi pieza</option>
-                                    <option value="instagram">Historias de Instagram</option>
-                                    <option value="whatsapp">Grupos de WhatsApp</option>
-                                    <option value="marketplace">Marketplace / Yapo</option>
-                                </select>
+                            <div id="seller-panel">
+                                <div class="field">
+                                    <label class="field-label">¿Qué tienes guardado para vender? (Selecciona)</label>
+                                    <div class="chips-grid">
+                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="calculadora"><span>Calculadora</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="libros"><span>Libros / Guías</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="maqueta"><span>Material Maqueta</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="bata"><span>Bata / Lab</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="electronica"><span>Cables / Tech</span></label>
+                                        <label class="chip-checkbox"><input type="checkbox" name="items" value="otro"><span>Otro</span></label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="field-label" for="canal_actual">¿Dónde intentaste venderlos antes?</label>
+                                    <select id="canal_actual" name="canal_actual">
+                                        <option value="guardados">Aún no lo intento, siguen en mi pieza</option>
+                                        <option value="instagram">Historias de Instagram</option>
+                                        <option value="whatsapp">Grupos de WhatsApp</option>
+                                        <option value="marketplace">Marketplace / Yapo</option>
+                                    </select>
+                                </div>
                             </div>
+
+                            <label class="early-check">
+                                <input type="checkbox" id="early_access" name="early_access" checked>
+                                <span>Quiero participar en el piloto de prueba esta semana y tener acceso anticipado.</span>
+                            </label>
+
+                            <button type="submit" class="btn-submit" id="submit-btn">Quiero acceso anticipado <span>→</span></button>
+                            <p class="trust-note" id="form-status">Sin pagos en la app · Trato directo en el campus · 0% comisión</p>
+                        </form>
+                    </div>
+
+                    <div id="success-state">
+                        <div class="success-icon">✓</div>
+                        <h3>¡Cupo reservado!</h3>
+                        <p>Ya eres parte de la lista fundadora en el campus. Te enviamos un correo de confirmación y te escribiremos apenas habilitemos la carga de productos.</p>
+                        <button type="button" class="btn-share" id="copy-link-btn">Copiar link para compartir en tu grupo</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CATÁLOGO DE EJEMPLO -->
+            <section class="catalogo">
+                <div class="section-head">
+                    <div>
+                        <h2>Así se verán los productos</h2>
+                        <p>Ejemplos de publicaciones que los estudiantes harán en el campus.</p>
+                    </div>
+                    <div class="filter-pills">
+                        <span class="pill active">Todos</span>
+                        <span class="pill">Arquitectura</span>
+                        <span class="pill">Ingeniería</span>
+                        <span class="pill">Salud</span>
+                    </div>
+                </div>
+
+                <div class="product-grid">
+                    <article class="product-card">
+                        <div class="product-thumb">🧮</div>
+                        <div class="product-body">
+                            <span class="product-cat">Ingeniería</span>
+                            <h3 class="product-name">Calculadora Casio fx-991</h3>
+                            <p class="product-desc">Calculadora científica en excelente estado, usada solo en Cálculo I. Incluye funda.</p>
+                            <div class="product-foot">
+                                <span class="product-price">$12.000</span>
+                                <span class="status-badge status-available">● Disponible</span>
+                            </div>
+                            <p class="product-place">📍 Entrega en Patio Central</p>
                         </div>
+                    </article>
 
-                        <label class="early-check">
-                            <input type="checkbox" id="early_access" name="early_access" checked>
-                            <span>Quiero participar en el piloto de prueba esta semana y tener acceso anticipado.</span>
-                        </label>
+                    <article class="product-card">
+                        <div class="product-thumb">📐</div>
+                        <div class="product-body">
+                            <span class="product-cat">Arquitectura</span>
+                            <h3 class="product-name">Set reglas + bisturí de maqueta</h3>
+                            <p class="product-desc">Kit completo de taller: regla escala, bisturí y cuchillas nuevas. Poco uso.</p>
+                            <div class="product-foot">
+                                <span class="product-price">$8.500</span>
+                                <span class="status-badge status-reserved">◐ Reservado</span>
+                            </div>
+                            <p class="product-place">📍 Entrega en Taller de Arquitectura</p>
+                        </div>
+                    </article>
 
-                        <button type="submit" class="btn-submit">
-                            Quiero acceso anticipado <span>→</span>
-                        </button>
-                        <p class="trust-note">Sin pagos en la app · Trato directo en el campus · 0% comisión</p>
-                    </form>
+                    <article class="product-card">
+                        <div class="product-thumb">📘</div>
+                        <div class="product-body">
+                            <span class="product-cat">Ingeniería</span>
+                            <h3 class="product-name">Libro Cálculo I · Stewart</h3>
+                            <p class="product-desc">Edición internacional, sin subrayados. Ideal para el próximo semestre.</p>
+                            <div class="product-foot">
+                                <span class="product-price">$15.000</span>
+                                <span class="status-badge status-available">● Disponible</span>
+                            </div>
+                            <p class="product-place">📍 Entrega en Biblioteca Central</p>
+                        </div>
+                    </article>
+
+                    <article class="product-card">
+                        <div class="product-thumb">🥼</div>
+                        <div class="product-body">
+                            <span class="product-cat">Salud</span>
+                            <h3 class="product-name">Bata de laboratorio</h3>
+                            <p class="product-desc">Bata blanca talla M, lavada y en buen estado. Lista para usar.</p>
+                            <div class="product-foot">
+                                <span class="product-price">$9.000</span>
+                                <span class="status-badge status-available">● Disponible</span>
+                            </div>
+                            <p class="product-place">📍 Entrega en Facultad de Salud</p>
+                        </div>
+                    </article>
+
+                    <article class="product-card">
+                        <div class="product-thumb">🔌</div>
+                        <div class="product-body">
+                            <span class="product-cat">Ingeniería</span>
+                            <h3 class="product-name">Cables y adaptadores</h3>
+                            <p class="product-desc">Set de cables USB-C, HDMI y adaptador. Funcionando perfectamente.</p>
+                            <div class="product-foot">
+                                <span class="product-price">$6.000</span>
+                                <span class="status-badge status-available">● Disponible</span>
+                            </div>
+                            <p class="product-place">📍 Entrega en Patio Central</p>
+                        </div>
+                    </article>
+
+                    <article class="product-card">
+                        <div class="product-thumb">📏</div>
+                        <div class="product-body">
+                            <span class="product-cat">Arquitectura</span>
+                            <h3 class="product-name">Set de instrumentos de dibujo</h3>
+                            <p class="product-desc">Compás, escuadras y lápices. Todo en buen estado para el próximo año.</p>
+                            <div class="product-foot">
+                                <span class="product-price">$11.000</span>
+                                <span class="status-badge status-reserved">◐ Reservado</span>
+                            </div>
+                            <p class="product-place">📍 Entrega en Taller de Arquitectura</p>
+                        </div>
+                    </article>
                 </div>
-
-                <!-- Pantalla post-registro -->
-                <div id="success-state">
-                    <div class="success-icon">✓</div>
-                    <h3>¡Cupo reservado!</h3>
-                    <p>Ya eres parte de la lista fundadora en el campus. Te escribiremos al correo apenas habilitemos la carga de productos esta semana.</p>
-                    <button type="button" class="btn-share" id="copy-link-btn">Copiar link para compartir en tu grupo</button>
-                </div>
-            </div>
+            </section>
         </main>
+
+        <footer>CampusSwap · Piloto Fin de Semestre · UDD · Sin pagos en la app · 0% comisión</footer>
     </div>
 
     <script>
-        // Mostrar/ocultar panel de inventario vendedor
         const roleRadios = document.querySelectorAll('input[name="rol"]');
         const sellerPanel = document.getElementById('seller-panel');
-
         roleRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
-                if (e.target.value === 'vender' || e.target.value === 'ambos') {
-                    sellerPanel.style.display = 'flex';
-                } else {
-                    sellerPanel.style.display = 'none';
-                }
+                sellerPanel.style.display = (e.target.value === 'vender' || e.target.value === 'ambos') ? 'flex' : 'none';
             });
         });
 
-        // Envío y analítica de conversión
         const form = document.getElementById('validation-form');
         const formContainer = document.getElementById('form-container');
         const successState = document.getElementById('success-state');
+        const submitBtn = document.getElementById('submit-btn');
+        const formStatus = document.getElementById('form-status');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const formData = new FormData(form);
             const items = Array.from(document.querySelectorAll('input[name="items"]:checked')).map(i => i.value);
-            const rol = formData.get('rol');
-
             const data = {
                 timestamp: new Date().toISOString(),
                 email: formData.get('email'),
                 carrera: formData.get('carrera'),
-                rol: rol,
-                tiene_algo_para_vender: (rol === 'vender' || rol === 'ambos'),
+                rol: formData.get('rol'),
+                tiene_algo_para_vender: ['vender', 'ambos'].includes(formData.get('rol')),
                 items: items,
                 canal_actual: formData.get('canal_actual') || 'N/A',
                 early_access: document.getElementById('early_access').checked
             };
 
-            // Evento para Google Tag Manager / GA4
             window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-                'event': 'validacion_form_submit',
-                'rol_estudiante': data.rol,
-                'es_vendedor': data.tiene_algo_para_vender
-            });
+            window.dataLayer.push({ 'event': 'validacion_form_submit', 'rol_estudiante': data.rol, 'es_vendedor': data.tiene_algo_para_vender });
 
-            console.log('Validación registrada:', data);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+            formStatus.textContent = 'Enviando tu registro y correo de confirmación...';
 
-            // Conectar aquí tu Google Apps Script / Formspree / Make:
-            /*
-            await fetch('TU_ENDPOINT_AQUI', {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            */
+            try {
+                const response = await fetch('/.netlify/functions/submit-form', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-            formContainer.style.display = 'none';
-            successState.style.display = 'block';
+                if (!response.ok) throw new Error('Error en el servidor');
+
+                formContainer.style.display = 'none';
+                successState.style.display = 'block';
+            } catch (err) {
+                formStatus.textContent = 'No pudimos enviar tu registro. Intenta nuevamente o escríbenos a administracionollacomun@gmail.com';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Quiero acceso anticipado <span>→</span>';
+            }
         });
 
-        // Botón viral para compartir en WhatsApp de generación
         document.getElementById('copy-link-btn').addEventListener('click', function() {
             navigator.clipboard.writeText(window.location.href);
             this.textContent = '¡Link copiado al portapapeles!';
-            setTimeout(() => {
-                this.textContent = 'Copiar link para compartir en tu grupo';
-            }, 2500);
+            setTimeout(() => { this.textContent = 'Copiar link para compartir en tu grupo'; }, 2500);
         });
     </script>
 </body>

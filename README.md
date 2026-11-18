@@ -2,100 +2,101 @@
 
 > Nombre **provisional**. Pendiente de definir el nombre final y el logo.
 
-Landing + formulario de validación para el **Desafío 4: "Segunda mano en el campus"** (Unidad 3, Fichas de desafíos digitales · Desarrollo de Productos · New Ventures Program).
+Landing de inicio + formulario de validación para el **Desafío 4: "Segunda mano en el campus"** (Unidad 3, Fichas de desafíos digitales · Desarrollo de Productos · New Ventures Program).
+
+## Qué contiene la página
+
+1. **Hero con el formulario grande y destacado** — es lo primero que se ve, porque es la pieza clave de validación.
+2. **Ejemplo de productos en venta** — tarjetas con nombre, precio, pequeña descripción, categoría, estado (`Disponible`/`Reservado`) y punto de entrega en el campus.
+3. **Integración con Brevo** — al enviar el formulario:
+   - Se envía un correo de **confirmación y agradecimiento** al estudiante.
+   - Se envía un correo de **aviso a administración** (`administracionollacomun@gmail.com`) con todos los datos del registro.
 
 ## El problema
 
-Cada semestre, cientos de estudiantes compran implementos que usarán unos meses (calculadoras científicas, libros de cálculo, batas de laboratorio, materiales de maqueta). Al terminar el ramo quedan guardados. Hoy la compraventa ocurre en grupos de Instagram y WhatsApp donde:
+Cada semestre, cientos de estudiantes compran implementos que usarán unos meses (calculadoras científicas, libros de cálculo, batas de laboratorio, materiales de maqueta). Al terminar el ramo quedan guardados. Hoy la compraventa ocurre en grupos de Instagram y WhatsApp donde las publicaciones se pierden en horas, no se sabe si el producto sigue disponible y nadie confía en pagar por adelantado.
 
-- Las publicaciones se pierden en horas.
-- No se sabe si el producto sigue disponible.
-- Nadie confía en pagar por adelantado.
+## El MVP
 
-## La solución (MVP)
+Landing estática + una Netlify Function que envía los correos. Cumple la restricción de "MVP sin programar" en el sentido de que no hay base de datos ni backend propio: solo una función serverless gratuita para usar la API de Brevo de forma segura.
 
-Una **landing de acceso anticipado** que valida la demanda antes de construir el producto completo:
-
-1. **Propuesta de valor clara** para vendedores y compradores del segmento principal (estudiantes que venden y estudiantes que compran).
-2. **Vista previa del catálogo** con los atributos críticos del desafío: filtros por carrera, precio, estado (`Disponible` / `Reservado`) y punto de entrega dentro del campus.
-3. **Formulario de validación** que mide:
-   - Correo institucional y carrera (pertenencia a la comunidad).
-   - Rol: vender / comprar / ambos.
-   - Si es vendedor: qué tiene guardado y dónde intentó venderlo antes.
-   - Intención de participar en el piloto.
-4. **Estado de éxito** con botón para copiar el link y compartirlo (viralidad orgánica en grupos de curso).
-5. **Evento de analítica** (`validacion_form_submit`) listo para Google Tag Manager / GA4.
-
-Este MVP se construyó **sin programación de backend**, cumpliendo la restricción de la ficha: es una landing con formulario. Los datos se capturan en el evento de analítica y en `console.log`; el envío real está preparado pero pendiente de conectar un endpoint.
-
-## Restricciones del desafío cubiertas
-
-| Restricción de la ficha | Cómo se aborda en este MVP |
-| --- | --- |
-| Solo entre estudiantes de la universidad | Se pide correo institucional (`@udd.cl`) y carrera. |
-| Sin pagos en línea en el MVP | Copy explícito: "Sin pagos en la app · Trato directo en el campus · 0% comisión". |
-| No se permiten productos prohibidos | Se muestran solo implementos académicos permitidos en el catálogo mock; se reforzará en el formulario de carga cuando se habilite. |
-| Debe probarse a fin de semestre, cuando hay poca demanda | La landing se enfoca en "vender antes de irte de vacaciones" y mide oferta acumulada para la próxima temporada. |
-| Sin costo / planes gratuitos | HTML estático, sin dependencias de pago; se puede publicar en GitHub Pages. |
-| Sin datos sensibles | No se piden RUT, contraseñas, ClaveÚnica, datos bancarios ni de salud. |
-
-## Evidencia esperada (métricas)
-
-La ficha pide: **productos publicados, intercambios concretados y tiempo entre la publicación y la venta**. Para esta primera fase de validación se miden estos proxies en el formulario:
-
-| Métrica de comportamiento | Umbral de éxito (definido antes de probar) |
-| --- | --- |
-| Registros válidos con correo institucional | ≥ 30 en 3 días |
-| % de registros con al menos un implemento para vender | ≥ 20% (1 de cada 5 estudiantes tiene algo guardado) |
-| Registros que marcan "Quiero acceso anticipado" | ≥ 50% del total |
-| Carreras distintas representadas | ≥ 3 |
-
-*Nota: los umbrales son propuestos por el equipo y deben confirmarse antes de iniciar las pruebas con usuarios reales.*
-
-## Cómo ejecutar / publicar
-
-### Local
-
-No requiere instalación. Abre `index.html` en un navegador, o sirve la carpeta con:
-
-```bash
-python -m http.server 8000
-```
-
-Luego visita `http://localhost:8000`.
-
-### GitHub Pages
-
-El repo está listo para publicarse con GitHub Pages desde la rama principal (`main`), carpeta `/ (root)`.
-
-### Conectar el formulario a un endpoint
-
-En `index.html`, dentro del listener `submit`, reemplaza el bloque comentado:
-
-```js
-await fetch('TU_ENDPOINT_AQUI', {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-});
-```
-
-Opciones gratuitas sugeridas: Google Apps Script (atado a una Google Sheet), Formspree (plan gratuito) o Make.com.
+> **Seguridad:** la clave API de Brevo **nunca** está en el código. Se lee de la variable de entorno `BREVO_API_KEY` en Netlify.
 
 ## Estructura
 
 ```
 .
-├── index.html   # Landing + preview del catálogo + formulario de validación
-└── README.md    # Este archivo
+├── index.html                         # Landing + catálogo de ejemplo + formulario
+├── netlify.toml                       # Configuración de publicación y funciones
+├── netlify/functions/submit-form.js   # Endpoint que envía los 2 correos vía Brevo
+└── README.md                          # Este archivo
 ```
+
+## Configuración (importante)
+
+El formulario llama a `/.netlify/functions/submit-form`, que solo funciona cuando el sitio está desplegado en **Netlify** (GitHub Pages no ejecuta funciones).
+
+### Pasos
+
+1. Crear una cuenta en [Netlify](https://www.netlify.com/) y conectar el repo `joaqalmonacid-star/PersaUDD`.
+2. En Netlify: **Site settings → Environment variables → Add variable**:
+   - `BREVO_API_KEY` = tu clave API de Brevo (la que empieza con `xkeysib-...`).
+3. Configuración del build (ya viene en `netlify.toml`):
+   - Publish directory: `.` (raíz)
+   - Functions directory: `netlify/functions`
+4. Hacer deploy. Cada push a `main` actualiza el sitio automáticamente.
+
+### Verificar el remitente en Brevo
+
+Brevo solo envía desde remitentes verificados. Confirma en **Settings → Senders & Domains** que `administracionollacomun@gmail.com` esté validado como remitente. Si no, los correos pueden ser rechazados con un error 400/401.
+
+### Prueba local (opcional)
+
+Con [Netlify CLI](https://docs.netlify.com/cli/get-started/):
+
+```bash
+npm install -g netlify-cli
+netlify link      # conecta con tu sitio de Netlify para tomar las variables de entorno
+netlify dev
+```
+
+Luego abre `http://localhost:8888` y envía el formulario.
+
+## Correos que envía la función
+
+| Destinatario | Asunto | Contenido |
+| --- | --- | --- |
+| Correo del estudiante | `¡Gracias por tu interés en CampusSwap! 🎉` | Agradecimiento y aviso de que se escribirá al habilitar la carga de productos. |
+| `administracionollacomun@gmail.com` | `Nuevo registro CampusSwap · {carrera}` | Correo, carrera, rol, implementos, canal anterior, acceso anticipado y fecha. |
+
+## Restricciones del desafío cubiertas
+
+| Restricción de la ficha | Cómo se aborda |
+| --- | --- |
+| Solo entre estudiantes de la universidad | Se pide correo institucional y carrera. |
+| Sin pagos en línea en el MVP | Copy explícito: "Sin pagos en la app · Trato directo en el campus · 0% comisión". |
+| No se permiten productos prohibidos | El catálogo de ejemplo solo muestra implementos académicos. |
+| Debe probarse a fin de semestre, cuando hay poca demanda | El hero enfocado en "vender antes de irte de vacaciones" y la medición de oferta acumulada. |
+| Sin costo / planes gratuitos | Netlify y Brevo tienen planes gratuitos suficientes para el piloto. |
+| Sin datos sensibles | No se piden RUT, contraseñas, ClaveÚnica, datos bancarios ni de salud. |
+
+## Evidencia esperada (métricas)
+
+La ficha pide: **productos publicados, intercambios concretados y tiempo entre la publicación y la venta**. En esta fase se miden estos proxies:
+
+| Métrica de comportamiento | Umbral de éxito (propuesto, confirmar antes de probar) |
+| --- | --- |
+| Registros válidos con correo institucional | ≥ 30 en 3 días |
+| % de registros con al menos un implemento para vender | ≥ 20% |
+| Registros que marcan "Quiero acceso anticipado" | ≥ 50% |
+| Carreras distintas representadas | ≥ 3 |
 
 ## Estado
 
-- [x] Adaptación del index al caso del desafío 4
-- [x] Corrección de un `<label>` inválido dentro del `<select>` del index original
-- [x] Evento de analítica y manejo del estado de éxito
-- [ ] Nombre y logo definitivos
-- [ ] Conectar endpoint real de registro
-- [ ] Pruebas con estudiantes reales del segmento y medición de umbrales
+- [x] Landing de inicio con catálogo de ejemplo (nombre, precio, descripción, estado y entrega).
+- [x] Formulario grande y destacado en el hero.
+- [x] Envío vía Brevo (confirmación al estudiante + aviso a administración).
+- [x] Clave API protegida como variable de entorno.
+- [ ] Nombre y logo definitivos.
+- [ ] Conectar Netlify y configurar `BREVO_API_KEY`.
+- [ ] Pruebas con estudiantes reales y medición de umbrales.

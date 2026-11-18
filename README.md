@@ -88,6 +88,7 @@ Cada push a `main` dispara el workflow y actualiza el sitio automáticamente.
 ## Identidad visual
 
 - **Logo:** `images/meco_logo.png` (MECO), usado en el navbar y como favicon.
+- **Fondo:** degradado suave en celeste, azul marino y verde sobre blanco, sin patrón de puntos.
 - **Paleta oficial** (`Paleta de colores.txt`), aplicada en `:root` de `index.html`:
 
 | Color | Hex | Uso en la página |

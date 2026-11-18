@@ -344,13 +344,12 @@
         <footer>CampusSwap · Piloto Fin de Semestre · UDD · Sin pagos en la app · 0% comisión</footer>
     </div>
 
+    <!-- config.js se genera en el deploy desde el secreto BREVO_API_KEY de GitHub -->
+    <script src="config.js"></script>
     <script>
-        // ============================================================
-        // CONFIGURACIÓN: pega aquí la URL "action" que entrega Brevo
-        // al copiar el código de incrustación de tu formulario.
-        // Ejemplo: https://tu-cuenta.sibforms.com/serve/MUIF...
-        // ============================================================
-        const BREVO_FORM_ACTION = 'https://TU-CUENTA.sibforms.com/serve/MUIF...';
+        const BREVO_CONFIG = window.BREVO_CONFIG || {};
+        const BREVO_API_KEY = BREVO_CONFIG.apiKey || '';
+        const BREVO_LIST_ID = BREVO_CONFIG.listId || 3;
 
         const roleRadios = document.querySelectorAll('input[name="ROL"]');
         const sellerPanel = document.getElementById('seller-panel');
@@ -384,8 +383,8 @@
                 'es_vendedor': ['vender', 'ambos'].includes(rol)
             });
 
-            if (BREVO_FORM_ACTION.includes('TU-CUENTA')) {
-                formStatus.textContent = 'Falta configurar la URL de envío de Brevo en el archivo index.html (const BREVO_FORM_ACTION).';
+            if (!BREVO_API_KEY) {
+                formStatus.textContent = 'Falta la configuración de Brevo. Abre esta página desde el sitio publicado en GitHub Pages.';
                 return;
             }
 
@@ -393,12 +392,83 @@
             submitBtn.textContent = 'Enviando...';
             formStatus.textContent = 'Enviando tu registro y correo de confirmación...';
 
+            const escapeHtml = (value) => String(value)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+            const brevoHeaders = {
+                'api-key': BREVO_API_KEY,
+                'Content-Type': 'application/json'
+            };
+
+            const sendEmail = (payload) => fetch('https://api.brevo.com/v3/smtp/email', {
+                method: 'POST',
+                headers: brevoHeaders,
+                body: JSON.stringify(payload)
+            });
+
             try {
-                await fetch(BREVO_FORM_ACTION, {
+                // 1) Guardar el registro como contacto en la lista de Brevo
+                const contactRes = await fetch('https://api.brevo.com/v3/contacts', {
                     method: 'POST',
-                    body: new FormData(form),
-                    mode: 'no-cors'
+                    headers: brevoHeaders,
+                    body: JSON.stringify({
+                        email: formData.get('EMAIL'),
+                        attributes: {
+                            CARRERA: formData.get('CARRERA'),
+                            ROL: rol,
+                            ITEMS: items.join(', '),
+                            DETALLE: document.getElementById('detalle').value,
+                            CANAL_ACTUAL: formData.get('CANAL_ACTUAL') || 'N/A',
+                            EARLY_ACCESS: document.getElementById('early_access').checked ? 'true' : 'false'
+                        },
+                        listIds: [BREVO_LIST_ID],
+                        updateEnabled: true
+                    })
                 });
+                if (!contactRes.ok) throw new Error('contacto');
+
+                const sender = { name: 'CampusSwap · Equipo', email: 'administracionollacomun@gmail.com' };
+
+                // 2) Confirmación y agradecimiento al estudiante
+                const confirmation = sendEmail({
+                    sender,
+                    to: [{ email: formData.get('EMAIL') }],
+                    subject: '¡Gracias por tu interés en CampusSwap! 🎉',
+                    htmlContent: `
+                        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#18181b">
+                            <h1 style="font-size:24px">¡Gracias por sumarte! 🙌</h1>
+                            <p>Recibimos tu registro para el piloto de <strong>CampusSwap</strong>, el mercado de segunda mano dentro del campus UDD.</p>
+                            <p>Te escribiremos al correo apenas habilitemos la carga de productos esta semana.</p>
+                            <p>Mientras tanto, recuerda: <strong>sin pagos en la app, trato directo en el campus y 0% comisión.</strong></p>
+                            <hr style="border:none;border-top:1px solid #e4e4e7;margin:24px 0">
+                            <p style="font-size:12px;color:#52525b">CampusSwap · Piloto Fin de Semestre · UDD</p>
+                        </div>`
+                });
+
+                // 3) Aviso a administración con los datos del registro
+                const notification = sendEmail({
+                    sender,
+                    to: [{ email: 'administracionollacomun@gmail.com', name: 'Administración' }],
+                    replyTo: { email: formData.get('EMAIL') },
+                    subject: `Nuevo registro CampusSwap · ${formData.get('CARRERA')}`,
+                    htmlContent: `
+                        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#18181b">
+                            <h1 style="font-size:20px">Nuevo registro de acceso anticipado</h1>
+                            <table style="width:100%;border-collapse:collapse;font-size:14px">
+                                <tr><td style="padding:8px 0;font-weight:bold">Correo:</td><td>${escapeHtml(formData.get('EMAIL'))}</td></tr>
+                                <tr><td style="padding:8px 0;font-weight:bold">Carrera:</td><td>${escapeHtml(formData.get('CARRERA'))}</td></tr>
+                                <tr><td style="padding:8px 0;font-weight:bold">Rol:</td><td>${escapeHtml(rol)}</td></tr>
+                                <tr><td style="padding:8px 0;font-weight:bold">Implementos:</td><td>${escapeHtml(items.join(', ') || 'ninguno')}</td></tr>
+                                <tr><td style="padding:8px 0;font-weight:bold">Canal anterior:</td><td>${escapeHtml(formData.get('CANAL_ACTUAL') || 'N/A')}</td></tr>
+                                <tr><td style="padding:8px 0;font-weight:bold">Acceso anticipado:</td><td>${document.getElementById('early_access').checked ? 'Sí' : 'No'}</td></tr>
+                            </table>
+                        </div>`
+                });
+
+                const results = await Promise.all([confirmation, notification]);
+                if (!results.every(r => r.ok)) throw new Error('correos');
+
                 formContainer.style.display = 'none';
                 successState.style.display = 'block';
             } catch (err) {

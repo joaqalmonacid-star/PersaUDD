@@ -1,173 +1,155 @@
 # OllaComun
 
-> Nombre definitivo: **OllaComun**. Pendiente: el logo.
+> Nombre definitivo: **OllaComun** · Logo MECO integrado.
 
-Landing de inicio + formulario de validación para el **Desafío 4: "Segunda mano en el campus"** (Unidad 3, Fichas de desafíos digitales · Desarrollo de Productos · New Ventures Program).
+Marketplace funcional para el **Desafío 4: "Segunda mano en el campus"** (Unidad 3, Fichas de desafíos digitales · Desarrollo de Productos · New Ventures Program).
 
 **Sitio publicado:** https://joaqalmonacid-star.github.io/PersaUDD/
+**Backend en Render:** https://ollacomun-auth.onrender.com
 
-## Qué contiene la página
+## Qué contiene
 
-1. **Hero con el formulario grande y destacado** — es lo primero que se ve.
-2. **Ejemplo de productos en venta** — nombre, precio, descripción, categoría, estado (`Disponible`/`Reservado`) y punto de entrega en el campus.
-3. **Integración con Brevo sin Netlify** — al enviar el formulario:
-   - Se crea/actualiza un **contacto** en la lista `OllaComun - Lista fundadora` de Brevo.
-   - Brevo envía un correo de **confirmación y agradecimiento** al estudiante.
-   - Brevo envía un correo de **aviso a administración** (`administracionollacomun@gmail.com`) con todos los datos.
-
-## Configuración ya realizada en Brevo
-
-| Elemento | Estado |
-| --- | --- |
-| Remitente verificado `administracionollacomun@gmail.com` | ✅ existente |
-| Atributos `CARRERA`, `ROL`, `ITEMS`, `DETALLE`, `CANAL_ACTUAL`, `EARLY_ACCESS` | ✅ creados |
-| Lista `OllaComun - Lista fundadora` (ID `3`) | ✅ creada |
-| Contacto de administración | ✅ creado |
-| Secreto `BREVO_API_KEY` en GitHub Actions | ✅ configurado |
-| GitHub Pages (build por Actions) | ✅ activado |
+1. **Landing tipo marketplace** (`index.html`): buscador arriba al centro por **nombre o categoría**, grilla de productos reales y menú lateral derecho con categorías por **carrera**, **tipo de producto** y **funcionalidad**.
+2. **Publicación de productos**: botón «+ Publicar producto» que abre un formulario con imagen, precio, carrera, tipo, funcionalidad y lugar de entrega. Cada producto guarda su **estado en el tiempo** (`disponible` → `reservado` → `vendido`) con historial de cambios.
+3. **Cuentas completas** (`auth.html`): registro exige **nombre, apellido, correo, carrera y teléfono** (ninguno opcional) más contraseña. Al crear la cuenta, Brevo envía un correo de confirmación desde `administracionollacomun@gmail.com`.
+4. **Menú de usuario** arriba a la derecha: al presionar el nombre se despliegan **Perfil**, **Soporte** y **Cerrar sesión** (ya no hay botón «Salir»).
+5. **Perfil editable** (`perfil.html`): el estudiante puede cambiar todos sus datos y ver/gestionar el estado de sus publicaciones.
+6. **Soporte** (`soporte.html`): correo de contacto y preguntas frecuentes.
+7. **Base de datos alojada** (MongoDB Atlas): cuentas y productos viven en la nube, no en la PC de nadie.
 
 ## Arquitectura
 
 ```
-index.html                 → landing + formulario; llama a la API de Brevo
-auth.html                  → página aparte de login / registro
-auth-config.js             → URL del backend de autenticación en Render
-backend/                   → API Node/Express (bcrypt + JWT) para login y registro
-render.yaml                → blueprint para desplegar la API en Render
-config.js                  → generado en el deploy (NO está en el repo)
-.github/workflows/deploy.yml → inyecta el secreto y publica en GitHub Pages + Cloudflare
+index.html                  → marketplace: búsqueda, categorías, grilla y publicación
+auth.html                   → login / registro (5 datos obligatorios)
+perfil.html                 → edición de perfil + "Mis publicaciones"
+soporte.html                → ayuda y contacto
+auth-config.js              → URL del backend en Render
+backend/server.js           → API Express: auth, perfil, productos, Brevo
+backend/store.js            → adaptador de almacenamiento (MongoDB / JSON local)
+render.yaml                 → blueprint del servicio en Render
+.github/workflows/deploy.yml → publica los HTML en GitHub Pages
 ```
 
-La clave API se guarda como **secreto de GitHub Actions** (`BREVO_API_KEY`). En cada deploy, el workflow genera `config.js` con esa clave y publica solo la carpeta `site/`.Por eso la clave no aparece en el historial de Git.
+La clave de Brevo **nunca viaja al navegador**: el registro la usa dentro del backend en Render. El front solo conoce `auth-config.js` con la URL de la API.
 
-> **Limitación inherente:** al ser una página estática sin backend, la clave viaja al navegador dentro de `config.js` y es visible para quien inspeccione el sitio publicado. Para un piloto de clase es aceptable; para producción, conviene mover las llamadas a un servidor o función serverless.
+## Base de datos (MongoDB Atlas, gratis)
 
-## Flujo al enviar el formulario
+Se usa el tier **M0 Free** de MongoDB Atlas (512 MB), alojado en la nube. No se instala nada en tu PC.
 
-1. `POST https://api.brevo.com/v3/contacts` → contacto con atributos y `listIds: [3]`, `updateEnabled: true`.
-2. `POST https://api.brevo.com/v3/smtp/email` → confirmación al correo del estudiante.
-3. `POST https://api.brevo.com/v3/smtp/email` → aviso a `administracionollacomun@gmail.com` con `replyTo` al estudiante.
+### Crearla una vez
 
-## Login / Registro con backend en Render
+1. Crea cuenta en https://www.mongodb.com/atlas y un **Shared Cluster** (M0 Free).
+2. En **Database Access** crea un usuario (usuario + contraseña) con rol *Read and write to any database*.
+3. En **Network Access** agrega `0.0.0.0/0` (Render necesita conectarse desde una IP dinámica).
+4. En **Database → Connect → Connect your application**, copia el connection string. Queda así:
+   `mongodb+srv://USUARIO:CONTRASEÑA@cluster0.xxxxx.mongodb.net/`
+5. En Render entra a **ollacomun-auth → Environment** y agrega:
+   - `MONGODB_URI` = el connection string completo (reemplaza `<password>` por tu contraseña real).
+   - `MONGODB_DB` = `ollacomun` (ya viene en `render.yaml`).
 
-Los botones **Iniciar sesión** y **Registrarse** están arriba a la derecha del navbar y abren `auth.html`, una página aparte. El formulario envía los datos a una API Node/Express desplegada en Render.
+El backend crea automáticamente las colecciones `users` y `products`, el índice único de correo y siembra 6 productos de ejemplo la primera vez.
 
-### Endpoints
+> Si `MONGODB_URI` no está configurada, el backend usa archivos JSON en `backend/data/` **solo para desarrollo local**. En Render debes configurar Mongo para que los datos no se pierdan al reiniciar.
+
+## Endpoints
 
 | Método | Ruta | Descripción |
 | --- | --- | --- |
-| `GET` | `/health` | Health check usado por Render. |
-| `POST` | `/api/register` | Crea cuenta con nombre, correo, contraseña y carrera opcional; envía el correo de confirmación por Brevo. |
-| `POST` | `/api/login` | Valida credenciales y devuelve un JWT de 7 días. |
-| `GET` | `/api/me` | Devuelve el usuario autenticado (header `Authorization: Bearer <token>`). |
+| `GET` | `/health` | Estado, tipo de storage, si Brevo está configurado y remitente. |
+| `GET` | `/api/categories` | Listas de carreras, tipos, funcionalidades, estados e imágenes. |
+| `POST` | `/api/register` | Crea cuenta con los 5 datos obligatorios + contraseña; envía correo Brevo. |
+| `POST` | `/api/login` | Valida credenciales y devuelve JWT de 7 días. |
+| `GET` | `/api/me` | Datos del usuario autenticado. |
+| `PUT` | `/api/me` | Actualiza nombre, apellido, correo, carrera y teléfono. |
+| `GET` | `/api/products` | Lista productos. Filtros: `q`, `carrera`, `tipo`, `funcionalidad`, `status`, `mine=true`. |
+| `POST` | `/api/products` | Publica un producto (requiere sesión). |
+| `PUT` | `/api/products/:id` | Edita un producto propio. |
+| `PATCH` | `/api/products/:id/status` | Cambia el estado y agrega una entrada al historial. |
 
-Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El token se guarda en `localStorage` y el navbar cambia a "Hola, nombre" + **Salir** cuando hay sesión activa.
+Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El token JWT se guarda en `localStorage`.
 
-El registro llama a `POST https://api.brevo.com/v3/smtp/email` **desde el servidor**, usando `BREVO_API_KEY`. Así la clave API nunca viaja al navegador. La respuesta incluye `emailSent` para indicar si el correo se envió.
+## Variables de entorno del backend
 
-### Variables de entorno de la API
-
-| Variable | Valor | Dónde se pone |
+| Variable | Valor | Dónde se configura |
 | --- | --- | --- |
-| `JWT_SECRET` | Cadena larga y aleatoria | La genera Render automáticamente (`generateValue: true`). |
-| `BREVO_API_KEY` | Tu clave API de Brevo | **Manual en Render** (`sync: false`). Nunca va en Git. |
-| `BREVO_SENDER_EMAIL` | `administracionollacomun@gmail.com` | `render.yaml` (remitente verificado en Brevo). |
+| `JWT_SECRET` | Cadena larga y aleatoria | La genera Render (`generateValue: true`). |
+| `BREVO_API_KEY` | Tu clave API de Brevo | **Manual en Render** (`sync: false`). Nunca en Git. |
+| `BREVO_SENDER_EMAIL` | `administracionollacomun@gmail.com` | `render.yaml` (remitente verificado). |
 | `BREVO_SENDER_NAME` | `OllaComun` | `render.yaml`. |
+| `MONGODB_URI` | Connection string de Atlas | **Manual en Render** (`sync: false`). |
+| `MONGODB_DB` | `ollacomun` | `render.yaml`. |
 
-### Desplegar la API en Render
+### Verificar el deploy
 
-1. En Render → **New +** → **Blueprint Instance** y conecta este repo de GitHub.
-2. Render detecta `render.yaml` y crea el servicio `ollacomun-auth` (plan free).
-3. En el paso de variables, pega tu **BREVO_API_KEY** (marcada como `sync: false`). Las demás ya vienen configuradas.
-4. Si el servicio ya existía: abre **ollacomun-auth → Environment** y agrega `BREVO_API_KEY` con tu clave. Render hará un redeploy automático.
-5. Espera a que el health check `/health` esté en verde.
-6. Copia la URL que te entrega Render (ej. `https://ollacomun-auth.onrender.com`) y, si es distinta, actualízala en `auth-config.js`. Luego haz push para que GitHub Pages y Cloudflare publiquen el cambio.
+Abre https://ollacomun-auth.onrender.com/health. Debe mostrar:
 
-> El correo de confirmación se envía al correo del estudiante, con remitente `administracionollacomun@gmail.com` (debe estar verificado en Brevo). Si la clave falta o falla, el registro igual se crea y el frontend avisa que no se pudo enviar el correo; revisa los logs de Render para ver el motivo.
+```json
+{
+  "status": "ok",
+  "storage": "mongo",
+  "brevoConfigured": true,
+  "sender": "administracionollacomun@gmail.com"
+}
+```
 
-### Probar la API en local
+Si `storage` es `file` o `brevoConfigured` es `false`, faltan `MONGODB_URI` o `BREVO_API_KEY` en Render (**Environment → Add Environment Variable**, luego *Save Changes* y Render redepliega solo).
+
+## Desarrollo local
 
 ```bash
 cd backend
 npm install
-copy .env.example .env   # Windows: usa "cp" en macOS/Linux
+copy .env.example .env   # Windows; en macOS/Linux usa "cp"
 npm start
 ```
 
-Luego:
+Sin `MONGODB_URI` se usa `backend/data/users.json` y `backend/data/products.json` (ignorados por Git). Para apuntar el frontend local a la API, cambia `window.AUTH_API_URL` en `auth-config.js` a `http://localhost:3000`.
 
-```bash
-curl http://localhost:3000/health
-curl -X POST http://localhost:3000/api/register -H "Content-Type: application/json" -d "{\"name\":\"Ana\",\"email\":\"ana@udd.cl\",\"password\":\"secreto123\",\"carrera\":\"Arquitectura\"}"
-curl -X POST http://localhost:3000/api/login -H "Content-Type: application/json" -d "{\"email\":\"ana@udd.cl\",\"password\":\"secreto123\"}"
-```
-
-Para apuntar el frontend local a tu API, cambia `window.AUTH_API_URL` en `auth-config.js` a `http://localhost:3000`.
-
-> **Limitación del plan free:** Render apaga la instancia tras ~15 min de inactividad; el primer request puede tardar unos segundos. El archivo `backend/data/users.json` es efímero: si el servicio se reinicia, se pierden las cuentas. Para producción real, usa una base de datos de Render y un disco persistente.
-
-## Desarrollo local
-
-`config.js` contiene la configuración de Brevo. GitHub lo genera automáticamente desde el secreto `BREVO_API_KEY` y `index.html` lo carga por **URL absoluta** (`https://joaqalmonacid-star.github.io/PersaUDD/config.js`). Gracias a eso, el formulario funciona igual en GitHub Pages, en Cloudflare Pages o al abrir `index.html` en local, sin necesidad de subir la clave al repo.
-
-Al enviar el formulario verás el mensaje **"¡Enviado correctamente!"** y se dispararán los dos correos: confirmación al estudiante y aviso a administración. Si algo falla, el mensaje de error aparece en rojo justo debajo del botón y los detalles quedan en la consola del navegador.
-
-Cada push a `main` dispara el workflow y actualiza el sitio automáticamente.
+Cada push a `main` dispara el workflow y actualiza GitHub Pages. En Cloudflare Pages haz un deploy nuevo desde `main`.
 
 ## Restricciones del desafío cubiertas
 
 | Restricción de la ficha | Cómo se aborda |
 | --- | --- |
-| Solo entre estudiantes de la universidad | Se pide correo institucional y carrera. |
-| Sin pagos en línea en el MVP | Copy explícito: "Sin pagos en la app · Trato directo en el campus · 0% comisión". |
-| No se permiten productos prohibidos | El catálogo de ejemplo solo muestra implementos académicos. |
-| Debe probarse a fin de semestre, cuando hay poca demanda | Hero enfocado en "vender antes de irte de vacaciones". |
-| Sin costo / planes gratuitos | Brevo, GitHub Pages y Render en plan gratuito. |
-| Sin datos sensibles | No se piden RUT, ClaveÚnica, datos bancarios ni de salud. La contraseña del login se almacena solo como hash bcrypt. |
+| Solo entre estudiantes de la universidad | Registro obligatorio con correo institucional, carrera y teléfono. |
+| Sin pagos en línea en el MVP | Copy explícito y precio informativo; trato directo en el campus. |
+| No se permiten productos prohibidos | Categorías acotadas a implementos académicos. |
+| Debe probarse a fin de semestre | Hero enfocado en vender antes de las vacaciones. |
+| Sin costo / planes gratuitos | Brevo, GitHub Pages, Render y MongoDB Atlas en plan gratuito. |
+| Sin datos sensibles | No se piden RUT, ClaveÚnica, datos bancarios ni de salud. Contraseñas hasheadas con bcrypt. |
 
 ## Evidencia esperada (métricas)
 
-| Métrica de comportamiento | Umbral de éxito (propuesto, confirmar antes de probar) |
+| Métrica | Umbral propuesto |
 | --- | --- |
-| Registros válidos con correo institucional | ≥ 30 en 3 días |
-| % de registros con al menos un implemento para vender | ≥ 20% |
-| Registros que marcan "Quiero acceso anticipado" | ≥ 50% |
+| Cuentas creadas con los 5 datos | ≥ 30 en 3 días |
+| Productos publicados | ≥ 15 en 3 días |
+| Productos con estado cambiado a reservado/vendido | ≥ 30% |
 | Carreras distintas representadas | ≥ 3 |
+| Búsquedas con resultados | ≥ 50% de búsquedas |
 
 ## Estado
 
-- [x] Landing de inicio con catálogo de ejemplo.
-- [x] Formulario grande y destacado.
-- [x] Contactos, atributos y lista creados en Brevo.
-- [x] Envío de confirmación al estudiante y aviso a administración.
-- [x] Clave como secreto de GitHub + deploy automático en Pages.
-- [x] Nombre definitivo: OllaComun.
-- [x] Imágenes reales de los productos con licencia libre.
-- [x] Logo MECO integrado (navbar y favicon).
-- [x] Paleta de colores oficial aplicada.
+- [x] Marketplace con búsqueda por nombre/categoría y menú lateral.
+- [x] Publicación de productos y estado con historial.
+- [x] Registro con 5 datos obligatorios y correo de confirmación Brevo.
+- [x] Menú desplegable: Perfil, Soporte, Cerrar sesión.
+- [x] Páginas `perfil.html` y `soporte.html`.
+- [x] Backend en Render con MongoDB Atlas (sin datos en la PC).
+- [x] Logo MECO, paleta oficial y fondo degradado.
+- [ ] Configurar `MONGODB_URI` en Render (paso pendiente del usuario).
 - [ ] Pruebas con estudiantes reales y medición de umbrales.
 
 ## Identidad visual
 
-- **Logo:** `images/meco_logo.png` (MECO), usado en el navbar y como favicon.
-- **Fondo:** degradado suave en celeste, azul marino y verde sobre blanco, sin patrón de puntos.
-- **Paleta oficial** (`Paleta de colores.txt`), aplicada en `:root` de `index.html`:
-
-| Color | Hex | Uso en la página |
-| --- | --- | --- |
-| Blanco | `#ffffff` | Fondo y superficies |
-| Azul marino | `#00295b` | Primario: títulos, botones, bordes, logo |
-| Negro | `#000000` | Texto |
-| Azul noche | `#000027` | Texto principal |
-| Rojo | `#ed1c24` | Acento: hover del CTA, etiquetas, estados de envío |
-| Verde | `#005f02` | Disponible y éxito |
-| Celeste | `#29abe2` | Foco de campos y panel de vendedores |
-| Amarillo | `#fcee21` | Estado "Reservado" |
-| Verde oscuro | `#0d280e` | Refuerzo de la paleta |
+- **Logo:** `images/meco_logo.png` (MECO), en navbar y favicon.
+- **Fondo:** degradado suave en celeste, azul marino y verde sobre blanco, sin puntos.
+- **Paleta oficial** aplicada en `:root`: blanco `#ffffff`, azul marino `#00295b`, negro `#000000`, azul noche `#000027`, rojo `#ed1c24`, verde `#005f02`, celeste `#29abe2`, amarillo `#fcee21`, verde oscuro `#0d280e`.
 
 ## Créditos de las imágenes
 
-Las fotos están en `images/` y son de dominio público o licencias libres (Wikimedia Commons), sin derechos de autor restrictivos:
+Fotos en `images/`, de dominio público o licencias libres (Wikimedia Commons):
 
 | Producto | Archivo | Autor | Licencia | Fuente |
 | --- | --- | --- | --- | --- |

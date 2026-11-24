@@ -18,3 +18,7 @@ services:
         value: administracionollacomun@gmail.com
       - key: BREVO_SENDER_NAME
         value: OllaComun
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: ollacomun

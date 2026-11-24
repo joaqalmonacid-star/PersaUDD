@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Soporte y ayuda de OllaComun.">
+    <title>OllaComun · Soporte</title>
+    <link rel="icon" type="image/png" href="images/meco_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --white:#ffffff; --navy:#00295b; --ink:#000027; --red:#ed1c24; --green:#005f02; --cyan:#29abe2; --yellow:#fcee21; }
+        * { box-sizing:border-box; margin:0; padding:0; font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif; }
+        body { min-height:100vh; color:var(--ink); line-height:1.55; background-color:var(--white); background-image: radial-gradient(ellipse 70% 45% at 6% 0%, rgba(41,171,226,0.22), rgba(41,171,226,0) 100%), radial-gradient(ellipse 60% 40% at 100% 10%, rgba(0,41,91,0.12), rgba(0,41,91,0) 100%); background-attachment:fixed; }
+        .container { width:100%; max-width:760px; margin:0 auto; padding:2rem 1.5rem 4rem; }
+        nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:2.5rem; }
+        .logo { font-weight:800; font-size:1.35rem; display:flex; align-items:center; gap:0.6rem; color:var(--navy); text-decoration:none; }
+        .logo-img { width:46px; height:46px; object-fit:contain; }
+        .back-link { color:var(--navy); text-decoration:none; font-weight:700; font-size:0.9rem; }
+        h1 { font-size:2.2rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:0.5rem; }
+        .lead { color:rgba(0,41,91,0.72); margin-bottom:2rem; }
+        .card { background:white; border:1px solid rgba(0,41,91,0.16); border-radius:16px; padding:1.75rem; margin-bottom:1.25rem; box-shadow:0 16px 32px -14px rgba(0,41,91,0.18); }
+        .card h2 { font-size:1.15rem; margin-bottom:0.6rem; color:var(--navy); }
+        .card p { font-size:0.94rem; color:rgba(0,41,91,0.78); }
+        a.mail { display:inline-block; margin-top:1rem; padding:0.85rem 1.3rem; background:var(--navy); color:white; text-decoration:none; border-radius:12px; font-weight:700; }
+        a.mail:hover { background:var(--red); }
+        ul { padding-left:1.2rem; } li { margin-bottom:0.5rem; font-size:0.94rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a class="logo" href="index.html"><img src="images/meco_logo.png" alt="Logo OllaComun" class="logo-img"> OllaComun</a>
+            <a class="back-link" href="index.html">← Volver al inicio</a>
+        </nav>
+        <h1>Soporte</h1>
+        <p class="lead">Estamos aquí para ayudarte con tu cuenta y tus publicaciones.</p>
+
+        <div class="card">
+            <h2>Escríbenos</h2>
+            <p>Envíanos un correo contando tu problema o duda y te responderemos lo antes posible.</p>
+            <a class="mail" href="mailto:administracionollacomun@gmail.com?subject=Consulta%20OllaComun">administracionollacomun@gmail.com</a>
+        </div>
+
+        <div class="card">
+            <h2>Preguntas frecuentes</h2>
+            <ul>
+                <li><strong>¿Quién puede usar OllaComun?</strong> Solo estudiantes de la universidad, con correo institucional.</li>
+                <li><strong>¿Hay pagos dentro de la app?</strong> No. El trato y la entrega se hacen directamente en el campus, sin comisión.</li>
+                <li><strong>¿Cómo cambio mis datos?</strong> Entra a tu perfil desde el menú de tu nombre y guarda los cambios.</li>
+                <li><strong>¿Cómo actualizo el estado de un producto?</strong> En «Mi perfil» → «Mis publicaciones» puedes marcarlo como disponible, reservado o vendido.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -28,6 +28,8 @@ jobs:
           mkdir -p site
           cp index.html site/index.html
           cp auth.html site/auth.html
+          cp perfil.html site/perfil.html
+          cp soporte.html site/soporte.html
           cp auth-config.js site/auth-config.js
           cp -r images site/images
           touch site/.nojekyll

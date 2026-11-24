@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Administra tu perfil y tus publicaciones en OllaComun.">
+    <title>OllaComun · Mi perfil</title>
+    <link rel="icon" type="image/png" href="images/meco_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff; --navy: #00295b; --ink: #000027; --red: #ed1c24;
+            --green: #005f02; --cyan: #29abe2; --yellow: #fcee21;
+            --surface: var(--white); --text-muted: rgba(0, 41, 91, 0.72);
+            --border: rgba(0, 41, 91, 0.16); --radius-lg: 16px; --radius-md: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body {
+            min-height: 100vh; color: var(--ink); line-height: 1.55;
+            background-color: var(--white);
+            background-image:
+                radial-gradient(ellipse 70% 45% at 6% 0%, rgba(41,171,226,0.22) 0%, rgba(41,171,226,0) 100%),
+                radial-gradient(ellipse 60% 40% at 100% 10%, rgba(0,41,91,0.12) 0%, rgba(0,41,91,0) 100%),
+                radial-gradient(ellipse 50% 35% at 50% 100%, rgba(0,95,2,0.07) 0%, rgba(0,95,2,0) 100%);
+            background-attachment: fixed;
+        }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+        nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+        .logo { font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.6rem; color: var(--navy); text-decoration: none; }
+        .logo-img { width: 46px; height: 46px; object-fit: contain; }
+        .back-link { color: var(--navy); text-decoration: none; font-weight: 700; font-size: 0.9rem; }
+        .back-link:hover { color: var(--red); }
+        h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.35rem; }
+        .sub { color: var(--text-muted); margin-bottom: 1.75rem; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: 0 20px 40px -12px rgba(0,41,91,0.16); margin-bottom: 1.75rem; }
+        form { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+        .field { display: flex; flex-direction: column; gap: 0.45rem; }
+        .field.full { grid-column: 1 / -1; }
+        label.field-label { font-size: 0.88rem; font-weight: 700; }
+        input, select {
+            width: 100%; padding: 0.85rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+            font-size: 1rem; color: var(--ink); background: var(--surface);
+        }
+        input:focus, select:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(41,171,226,0.25); }
+        .btn { padding: 0.9rem 1.4rem; background: var(--navy); color: white; border: none; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+        .btn:hover { background: var(--red); }
+        .btn:disabled { opacity: .6; cursor: wait; }
+        .message { min-height: 1.3em; margin-top: 1rem; font-size: 0.88rem; font-weight: 700; }
+        .message.ok { color: var(--green); } .message.error { color: var(--red); }
+        .my-product { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+        .my-product:last-child { border-bottom: none; }
+        .my-product strong { display: block; }
+        .my-product small { color: var(--text-muted); }
+        .status-select { width: auto; padding: 0.5rem 0.7rem; font-size: 0.85rem; }
+        .empty { color: var(--text-muted); font-size: 0.9rem; }
+        @media (max-width: 640px) { form { grid-template-columns: 1fr; } .card { padding: 1.5rem; } .my-product { flex-direction: column; align-items: flex-start; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a class="logo" href="index.html"><img src="images/meco_logo.png" alt="Logo OllaComun" class="logo-img"> OllaComun</a>
+            <a class="back-link" href="index.html">← Volver al inicio</a>
+        </nav>
+
+        <h1>Mi perfil</h1>
+        <p class="sub">Actualiza tus datos para que los demás estudiantes puedan contactarte.</p>
+
+        <div class="card">
+            <form id="profile-form">
+                <div class="field"><label class="field-label" for="name">Nombre</label><input type="text" id="name" required></div>
+                <div class="field"><label class="field-label" for="apellido">Apellido</label><input type="text" id="apellido" required></div>
+                <div class="field"><label class="field-label" for="carrera">Carrera</label><input type="text" id="carrera" list="carreras-list" required></div>
+                <div class="field"><label class="field-label" for="telefono">Teléfono</label><input type="tel" id="telefono" required></div>
+                <div class="field full"><label class="field-label" for="email">Correo</label><input type="email" id="email" required></div>
+                <div class="field full"><button type="submit" class="btn" id="save-btn">Guardar cambios</button></div>
+            </form>
+            <datalist id="carreras-list">
+                <option value="Arquitectura"></option><option value="Ingeniería"></option><option value="Salud"></option>
+                <option value="Ing. Comercial"></option><option value="Derecho"></option><option value="Educación"></option>
+            </datalist>
+            <div id="message" class="message" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="card">
+            <h2 style="font-size:1.35rem;margin-bottom:1rem">Mis publicaciones</h2>
+            <div id="my-products"><p class="empty">Cargando...</p></div>
+        </div>
+    </div>
+
+    <script src="auth-config.js"></script>
+    <script>
+        const API = String(window.AUTH_API_URL || '').replace(/\/$/, '');
+        const token = localStorage.getItem('authToken');
+        const message = document.getElementById('message');
+        const form = document.getElementById('profile-form');
+
+        function showMessage(text, kind) {
+            message.textContent = text;
+            message.className = 'message ' + (kind || '');
+        }
+
+        function authHeaders() {
+            return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+        }
+
+        if (!token) {
+            location.href = 'auth.html?mode=login';
+        }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch(API + '/api/me', { headers: authHeaders() });
+                if (!res.ok) throw new Error('Sesión expirada. Inicia sesión nuevamente.');
+                const data = await res.json();
+                const u = data.user;
+                document.getElementById('name').value = u.name || '';
+                document.getElementById('apellido').value = u.apellido || '';
+                document.getElementById('carrera').value = u.carrera || '';
+                document.getElementById('telefono').value = u.telefono || '';
+                document.getElementById('email').value = u.email || '';
+                localStorage.setItem('authUser', JSON.stringify(u));
+            } catch (err) {
+                showMessage(err.message, 'error');
+            }
+        }
+
+        async function loadMyProducts() {
+            const box = document.getElementById('my-products');
+            try {
+                const res = await fetch(API + '/api/products?mine=true', { headers: authHeaders() });
+                if (!res.ok) throw new Error('No se pudieron cargar tus publicaciones');
+                const data = await res.json();
+                if (!data.products.length) {
+                    box.innerHTML = '<p class="empty">Aún no tienes publicaciones. Usa el botón «Publicar producto» en el inicio.</p>';
+                    return;
+                }
+                box.innerHTML = data.products.map(p => `
+                    <div class="my-product">
+                        <div><strong>${escapeHtml(p.name)}</strong><small>$${Number(p.price).toLocaleString('es-CL')} · Publicado el ${new Date(p.createdAt).toLocaleDateString('es-CL')}</small></div>
+                        <select class="status-select" data-id="${p.id}">
+                            <option value="disponible" ${p.status === 'disponible' ? 'selected' : ''}>Disponible</option>
+                            <option value="reservado" ${p.status === 'reservado' ? 'selected' : ''}>Reservado</option>
+                            <option value="vendido" ${p.status === 'vendido' ? 'selected' : ''}>Vendido</option>
+                        </select>
+                    </div>`).join('');
+
+                box.querySelectorAll('.status-select').forEach(select => {
+                    select.addEventListener('change', async () => {
+                        try {
+                            const res = await fetch(API + '/api/products/' + select.dataset.id + '/status', {
+                                method: 'PATCH', headers: authHeaders(),
+                                body: JSON.stringify({ status: select.value })
+                            });
+                            if (!res.ok) throw new Error('No se pudo actualizar el estado');
+                            showMessage('Estado actualizado correctamente.', 'ok');
+                        } catch (err) {
+                            showMessage(err.message, 'error');
+                        }
+                    });
+                });
+            } catch (err) {
+                box.innerHTML = '<p class="empty">' + escapeHtml(err.message) + '</p>';
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const button = document.getElementById('save-btn');
+            button.disabled = true;
+            showMessage('Guardando...', '');
+            try {
+                const res = await fetch(API + '/api/me', {
+                    method: 'PUT', headers: authHeaders(),
+                    body: JSON.stringify({
+                        name: document.getElementById('name').value.trim(),
+                        apellido: document.getElementById('apellido').value.trim(),
+                        carrera: document.getElementById('carrera').value.trim(),
+                        telefono: document.getElementById('telefono').value.trim(),
+                        email: document.getElementById('email').value.trim()
+                    })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'No se pudo guardar');
+                localStorage.setItem('authUser', JSON.stringify(data.user));
+                showMessage('¡Cambios guardados correctamente!', 'ok');
+            } catch (err) {
+                showMessage(err.message, 'error');
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        loadProfile();
+        loadMyProducts();
+    </script>
+</body>
+</html>

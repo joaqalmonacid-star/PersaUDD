@@ -8,3 +8,4 @@ site/
 backend/node_modules/
 backend/.env
 backend/data/users.json
+backend/data/products.json

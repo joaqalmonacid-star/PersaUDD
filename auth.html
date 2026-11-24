@@ -116,11 +116,27 @@
             <form id="register-form" style="display:none">
                 <div class="field">
                     <label class="field-label" for="register-name">Nombre</label>
-                    <input type="text" id="register-name" autocomplete="name" placeholder="Tu nombre" required>
+                    <input type="text" id="register-name" autocomplete="given-name" placeholder="Tu nombre" required>
                 </div>
                 <div class="field">
-                    <label class="field-label" for="register-carrera">Carrera (opcional)</label>
-                    <input type="text" id="register-carrera" placeholder="Ej. Arquitectura" >
+                    <label class="field-label" for="register-apellido">Apellido</label>
+                    <input type="text" id="register-apellido" autocomplete="family-name" placeholder="Tu apellido" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="register-carrera">Carrera</label>
+                    <input type="text" id="register-carrera" list="carreras-list" placeholder="Ej. Arquitectura" required>
+                    <datalist id="carreras-list">
+                        <option value="Arquitectura"></option>
+                        <option value="Ingeniería"></option>
+                        <option value="Salud"></option>
+                        <option value="Ing. Comercial"></option>
+                        <option value="Derecho"></option>
+                        <option value="Educación"></option>
+                    </datalist>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="register-telefono">Teléfono</label>
+                    <input type="tel" id="register-telefono" autocomplete="tel" placeholder="+56 9 1234 5678" required>
                 </div>
                 <div class="field">
                     <label class="field-label" for="register-email">Correo</label>
@@ -182,7 +198,9 @@
                   }
                 : {
                     name: document.getElementById('register-name').value.trim(),
+                    apellido: document.getElementById('register-apellido').value.trim(),
                     carrera: document.getElementById('register-carrera').value.trim(),
+                    telefono: document.getElementById('register-telefono').value.trim(),
                     email: document.getElementById('register-email').value.trim(),
                     password: document.getElementById('register-password').value
                   };

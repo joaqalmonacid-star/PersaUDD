@@ -126,7 +126,12 @@ async function sendWelcomeEmail(user) {
     }
 }
 
-app.get('/health', (req, res) => res.json({ status: 'ok', service: 'ollacomun-auth' }));
+app.get('/health', (req, res) => res.json({
+    status: 'ok',
+    service: 'ollacomun-auth',
+    brevoConfigured: Boolean(BREVO_API_KEY),
+    sender: BREVO_SENDER_EMAIL
+}));
 
 app.post('/api/register', async (req, res) => {
     const body = req.body || {};

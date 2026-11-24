@@ -12,3 +12,9 @@ services:
         value: 20
       - key: JWT_SECRET
         generateValue: true
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_SENDER_EMAIL
+        value: administracionollacomun@gmail.com
+      - key: BREVO_SENDER_NAME
+        value: OllaComun

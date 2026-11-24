@@ -202,8 +202,17 @@
 
                 localStorage.setItem('authToken', data.token);
                 localStorage.setItem('authUser', JSON.stringify(data.user));
-                showMessage('¡Listo! Redirigiendo al inicio...', 'ok');
-                setTimeout(() => { location.href = 'index.html'; }, 700);
+
+                if (mode === 'register') {
+                    if (data.emailSent) {
+                        showMessage('¡Cuenta creada! Revisa tu correo: te enviamos la confirmación.', 'ok');
+                    } else {
+                        showMessage('¡Cuenta creada! No pudimos enviar el correo de confirmación.', 'error');
+                    }
+                } else {
+                    showMessage('¡Sesión iniciada! Redirigiendo...', 'ok');
+                }
+                setTimeout(() => { location.href = 'index.html'; }, mode === 'register' ? 2200 : 700);
             } catch (err) {
                 showMessage(err.message || 'No se pudo conectar con el servidor.', 'error');
                 button.disabled = false;

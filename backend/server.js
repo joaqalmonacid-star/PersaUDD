@@ -9,8 +9,16 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'ollacomun-dev-secret-change-me';
+const BREVO_API_KEY = process.env.BREVO_API_KEY || '';
+const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || 'administracionollacomun@gmail.com';
+const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'OllaComun';
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 const DATA_DIR = path.join(__dirname, 'data');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
+
+if (!BREVO_API_KEY) {
+    console.warn('BREVO_API_KEY no configurada: el registro no enviará correo de confirmación.');
+}
 
 app.use(cors({
     origin: '*',
@@ -64,9 +72,63 @@ function requireAuth(req, res, next) {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
+}
+
+async function sendWelcomeEmail(user) {
+    if (!BREVO_API_KEY) return { sent: false, reason: 'BREVO_API_KEY no configurada' };
+
+    const siteUrl = 'https://joaqalmonacid-star.github.io/PersaUDD/';
+    const safeName = escapeHtml(user.name);
+    const htmlContent = `
+        <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#000027;line-height:1.6">
+            <h1 style="color:#00295b;font-size:26px;margin:0 0 16px">¡Bienvenido/a a OllaComun, ${safeName}!</h1>
+            <p>Tu cuenta se creó correctamente. Ya puedes entrar con tu correo y contraseña.</p>
+            <p style="margin:24px 0">
+                <a href="${siteUrl}" style="background:#00295b;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:10px;font-weight:bold;display:inline-block">Ir a OllaComun</a>
+            </p>
+            <p style="color:#005f02"><strong>Recuerda:</strong> OllaComun es solo para estudiantes de la universidad. Sin pagos en línea, sin productos prohibidos y 0% comisión.</p>
+            <hr style="border:none;border-top:1px solid #dddddd;margin:28px 0 12px">
+            <p style="font-size:12px;color:#666666">Recibiste este correo porque te registraste en OllaComun. ${escapeHtml(BREVO_SENDER_EMAIL)}</p>
+        </div>`;
+    const textContent = `¡Bienvenido/a a OllaComun, ${user.name}! Tu cuenta se creó correctamente. Ingresa en ${siteUrl} para comenzar.`;
+
+    try {
+        const response = await fetch(BREVO_API_URL, {
+            method: 'POST',
+            headers: {
+                'api-key': BREVO_API_KEY,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
+                to: [{ email: user.email, name: user.name }],
+                subject: '¡Bienvenido/a a OllaComun! 🎉',
+                htmlContent,
+                textContent
+            })
+        });
+
+        if (!response.ok) {
+            const detail = await response.text();
+            console.error('Brevo rechazó el correo de confirmación:', response.status, detail);
+            return { sent: false, reason: 'Brevo respondió ' + response.status };
+        }
+
+        return { sent: true };
+    } catch (err) {
+        console.error('Error al enviar correo de confirmación:', err.message);
+        return { sent: false, reason: err.message };
+    }
+}
+
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'ollacomun-auth' }));
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
     const body = req.body || {};
     const name = String(body.name || '').trim();
     const email = String(body.email || '').trim().toLowerCase();
@@ -93,7 +155,8 @@ app.post('/api/register', (req, res) => {
     users.push(user);
     writeUsers(users);
 
-    res.status(201).json({ token: tokenFor(user), user: publicUser(user) });
+    const emailResult = await sendWelcomeEmail(user);
+    res.status(201).json({ token: tokenFor(user), user: publicUser(user), emailSent: emailResult.sent });
 });
 
 app.post('/api/login', (req, res) => {

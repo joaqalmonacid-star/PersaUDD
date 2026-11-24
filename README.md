@@ -57,21 +57,33 @@ Los botones **Iniciar sesión** y **Registrarse** están arriba a la derecha del
 | Método | Ruta | Descripción |
 | --- | --- | --- |
 | `GET` | `/health` | Health check usado por Render. |
-| `POST` | `/api/register` | Crea cuenta con nombre, correo, contraseña y carrera opcional. |
+| `POST` | `/api/register` | Crea cuenta con nombre, correo, contraseña y carrera opcional; envía el correo de confirmación por Brevo. |
 | `POST` | `/api/login` | Valida credenciales y devuelve un JWT de 7 días. |
 | `GET` | `/api/me` | Devuelve el usuario autenticado (header `Authorization: Bearer <token>`). |
 
 Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El token se guarda en `localStorage` y el navbar cambia a "Hola, nombre" + **Salir** cuando hay sesión activa.
 
+El registro llama a `POST https://api.brevo.com/v3/smtp/email` **desde el servidor**, usando `BREVO_API_KEY`. Así la clave API nunca viaja al navegador. La respuesta incluye `emailSent` para indicar si el correo se envió.
+
+### Variables de entorno de la API
+
+| Variable | Valor | Dónde se pone |
+| --- | --- | --- |
+| `JWT_SECRET` | Cadena larga y aleatoria | La genera Render automáticamente (`generateValue: true`). |
+| `BREVO_API_KEY` | Tu clave API de Brevo | **Manual en Render** (`sync: false`). Nunca va en Git. |
+| `BREVO_SENDER_EMAIL` | `administracionollacomun@gmail.com` | `render.yaml` (remitente verificado en Brevo). |
+| `BREVO_SENDER_NAME` | `OllaComun` | `render.yaml`. |
+
 ### Desplegar la API en Render
 
 1. En Render → **New +** → **Blueprint Instance** y conecta este repo de GitHub.
 2. Render detecta `render.yaml` y crea el servicio `ollacomun-auth` (plan free).
-3. La variable `JWT_SECRET` se genera automáticamente (`generateValue: true`).
-4. Espera a que el health check `/health` esté en verde.
-5. Copia la URL que te entrega Render (ej. `https://ollacomun-auth.onrender.com`) y, si es distinta, actualízala en `auth-config.js`. Luego haz push para que GitHub Pages y Cloudflare publiquen el cambio.
+3. En el paso de variables, pega tu **BREVO_API_KEY** (marcada como `sync: false`). Las demás ya vienen configuradas.
+4. Si el servicio ya existía: abre **ollacomun-auth → Environment** y agrega `BREVO_API_KEY` con tu clave. Render hará un redeploy automático.
+5. Espera a que el health check `/health` esté en verde.
+6. Copia la URL que te entrega Render (ej. `https://ollacomun-auth.onrender.com`) y, si es distinta, actualízala en `auth-config.js`. Luego haz push para que GitHub Pages y Cloudflare publiquen el cambio.
 
-> Si Render te asigna otra URL, también puedes definir `window.AUTH_API_URL` antes de cargar `auth.html` desde tu propio CDN. El valor por defecto ya coincide con el nombre del servicio del blueprint.
+> El correo de confirmación se envía al correo del estudiante, con remitente `administracionollacomun@gmail.com` (debe estar verificado en Brevo). Si la clave falta o falla, el registro igual se crea y el frontend avisa que no se pudo enviar el correo; revisa los logs de Render para ver el motivo.
 
 ### Probar la API en local
 

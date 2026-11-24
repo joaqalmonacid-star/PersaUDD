@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inicia sesión o crea tu cuenta en OllaComun.">
+    <title>OllaComun · Acceder</title>
+    <link rel="icon" type="image/png" href="images/meco_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff;
+            --navy: #00295b;
+            --black: #000000;
+            --ink: #000027;
+            --red: #ed1c24;
+            --green: #005f02;
+            --cyan: #29abe2;
+            --yellow: #fcee21;
+            --dark-green: #0d280e;
+
+            --bg: var(--white);
+            --surface: var(--white);
+            --text-main: var(--ink);
+            --text-muted: rgba(0, 41, 91, 0.72);
+            --primary: var(--navy);
+            --accent: var(--red);
+            --border: rgba(0, 41, 91, 0.16);
+            --emerald: var(--green);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.55;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse 70% 45% at 6% 0%, rgba(41, 171, 226, 0.22) 0%, rgba(41, 171, 226, 0) 100%),
+                radial-gradient(ellipse 60% 40% at 100% 10%, rgba(0, 41, 91, 0.12) 0%, rgba(0, 41, 91, 0) 100%),
+                radial-gradient(ellipse 50% 35% at 50% 100%, rgba(0, 95, 2, 0.07) 0%, rgba(0, 95, 2, 0) 100%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 41, 91, 0.04) 100%);
+            background-attachment: fixed;
+        }
+
+        .container { width: 100%; max-width: 520px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+        nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2.5rem; }
+        .logo { font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.6rem; color: var(--navy); text-decoration: none; }
+        .logo-img { width: 46px; height: 46px; object-fit: contain; display: block; }
+        .back-link { color: var(--navy); text-decoration: none; font-weight: 700; font-size: 0.9rem; white-space: nowrap; }
+        .back-link:hover { color: var(--accent); }
+
+        .auth-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: 0 20px 40px -12px rgba(0, 41, 91, 0.16); }
+
+        .tabs { display: flex; gap: 0.4rem; border-bottom: 1px solid var(--border); margin-bottom: 1.75rem; }
+        .tab { flex: 1; padding: 0.85rem 0.5rem; background: none; border: none; border-bottom: 3px solid transparent; font-size: 0.95rem; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: color 0.15s, border-color 0.15s; }
+        .tab:hover { color: var(--navy); }
+        .tab.active { color: var(--navy); border-bottom-color: var(--accent); }
+
+        form { display: flex; flex-direction: column; gap: 1.1rem; }
+        .field { display: flex; flex-direction: column; gap: 0.45rem; }
+        label.field-label { font-size: 0.88rem; font-weight: 700; color: var(--text-main); }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%; padding: 0.85rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius-md);
+            font-size: 1rem; color: var(--text-main); background: var(--surface); transition: all 0.15s ease;
+        }
+        input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(41, 171, 226, 0.25); }
+        .btn-auth { width: 100%; padding: 1rem; background: var(--primary); color: white; font-size: 1rem; font-weight: 700; border: none; border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s ease; }
+        .btn-auth:hover { background: var(--accent); }
+        .btn-auth:disabled { opacity: 0.6; cursor: wait; }
+
+        .message { margin-top: 1rem; min-height: 1.3em; font-size: 0.88rem; font-weight: 700; }
+        .message.error { color: var(--accent); }
+        .message.ok { color: var(--emerald); }
+        .hint { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 1.25rem; }
+        .hint strong { color: var(--navy); }
+
+        @media (max-width: 520px) {
+            .auth-card { padding: 1.5rem; }
+            nav { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a class="logo" href="index.html"><img src="images/meco_logo.png" alt="Logo OllaComun" class="logo-img"> OllaComun</a>
+            <a class="back-link" href="index.html">← Volver al inicio</a>
+        </nav>
+
+        <div class="auth-card">
+            <div class="tabs">
+                <button type="button" class="tab active" data-mode="login">Iniciar sesión</button>
+                <button type="button" class="tab" data-mode="register">Crear cuenta</button>
+            </div>
+
+            <form id="login-form">
+                <div class="field">
+                    <label class="field-label" for="login-email">Correo</label>
+                    <input type="email" id="login-email" autocomplete="email" placeholder="tunombre@udd.cl" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" autocomplete="current-password" placeholder="Tu contraseña" required>
+                </div>
+                <button type="submit" class="btn-auth" id="login-btn">Iniciar sesión</button>
+            </form>
+
+            <form id="register-form" style="display:none">
+                <div class="field">
+                    <label class="field-label" for="register-name">Nombre</label>
+                    <input type="text" id="register-name" autocomplete="name" placeholder="Tu nombre" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="register-carrera">Carrera (opcional)</label>
+                    <input type="text" id="register-carrera" placeholder="Ej. Arquitectura" >
+                </div>
+                <div class="field">
+                    <label class="field-label" for="register-email">Correo</label>
+                    <input type="email" id="register-email" autocomplete="email" placeholder="tunombre@udd.cl" required>
+                </div>
+                <div class="field">
+                    <label class="field-label" for="register-password">Contraseña</label>
+                    <input type="password" id="register-password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" minlength="6" required>
+                </div>
+                <button type="submit" class="btn-auth" id="register-btn">Crear cuenta</button>
+            </form>
+
+            <div id="message" class="message" role="status" aria-live="polite"></div>
+        </div>
+
+        <p class="hint">¿Ya tienes cuenta? <strong>Inicia sesión</strong>. ¿Eres nuevo? <strong>Crea una cuenta</strong> en un segundo.</p>
+    </div>
+
+    <script src="auth-config.js"></script>
+    <script>
+        const API = String(window.AUTH_API_URL || '').replace(/\/$/, '');
+        const message = document.getElementById('message');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const tabs = document.querySelectorAll('.tab');
+
+        function showMessage(text, kind) {
+            message.textContent = text;
+            message.className = 'message ' + (kind || '');
+        }
+
+        function setMode(mode) {
+            const isRegister = mode === 'register';
+            tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
+            loginForm.style.display = isRegister ? 'none' : 'flex';
+            registerForm.style.display = isRegister ? 'flex' : 'none';
+            showMessage('', '');
+            history.replaceState(null, '', 'auth.html?mode=' + mode);
+        }
+
+        tabs.forEach(tab => tab.addEventListener('click', () => setMode(tab.dataset.mode)));
+
+        const initialMode = new URLSearchParams(location.search).get('mode') === 'register' ? 'register' : 'login';
+        setMode(initialMode);
+
+        async function submit(mode, event) {
+            event.preventDefault();
+            const button = document.getElementById(mode + '-btn');
+
+            if (!API || API.includes('TU-SERVICIO')) {
+                showMessage('Falta configurar la URL del backend en auth-config.js.', 'error');
+                return;
+            }
+
+            const payload = mode === 'login'
+                ? {
+                    email: document.getElementById('login-email').value.trim(),
+                    password: document.getElementById('login-password').value
+                  }
+                : {
+                    name: document.getElementById('register-name').value.trim(),
+                    carrera: document.getElementById('register-carrera').value.trim(),
+                    email: document.getElementById('register-email').value.trim(),
+                    password: document.getElementById('register-password').value
+                  };
+
+            button.disabled = true;
+            button.textContent = 'Conectando...';
+            showMessage('', '');
+
+            try {
+                const response = await fetch(API + '/api/' + mode, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || 'No se pudo completar la solicitud');
+
+                localStorage.setItem('authToken', data.token);
+                localStorage.setItem('authUser', JSON.stringify(data.user));
+                showMessage('¡Listo! Redirigiendo al inicio...', 'ok');
+                setTimeout(() => { location.href = 'index.html'; }, 700);
+            } catch (err) {
+                showMessage(err.message || 'No se pudo conectar con el servidor.', 'error');
+                button.disabled = false;
+                button.textContent = mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta';
+            }
+        }
+
+        loginForm.addEventListener('submit', (e) => submit('login', e));
+        registerForm.addEventListener('submit', (e) => submit('register', e));
+    </script>
+</body>
+</html>

@@ -5,3 +5,6 @@ Thumbs.db
 .vscode/
 config.js
 site/
+backend/node_modules/
+backend/.env
+backend/data/users.json

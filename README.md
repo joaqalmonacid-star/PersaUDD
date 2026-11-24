@@ -30,8 +30,12 @@ Landing de inicio + formulario de validación para el **Desafío 4: "Segunda man
 
 ```
 index.html                 → landing + formulario; llama a la API de Brevo
+auth.html                  → página aparte de login / registro
+auth-config.js             → URL del backend de autenticación en Render
+backend/                   → API Node/Express (bcrypt + JWT) para login y registro
+render.yaml                → blueprint para desplegar la API en Render
 config.js                  → generado en el deploy (NO está en el repo)
-.github/workflows/deploy.yml → inyecta el secreto y publica en GitHub Pages
+.github/workflows/deploy.yml → inyecta el secreto y publica en GitHub Pages + Cloudflare
 ```
 
 La clave API se guarda como **secreto de GitHub Actions** (`BREVO_API_KEY`). En cada deploy, el workflow genera `config.js` con esa clave y publica solo la carpeta `site/`.Por eso la clave no aparece en el historial de Git.
@@ -43,6 +47,52 @@ La clave API se guarda como **secreto de GitHub Actions** (`BREVO_API_KEY`). En 
 1. `POST https://api.brevo.com/v3/contacts` → contacto con atributos y `listIds: [3]`, `updateEnabled: true`.
 2. `POST https://api.brevo.com/v3/smtp/email` → confirmación al correo del estudiante.
 3. `POST https://api.brevo.com/v3/smtp/email` → aviso a `administracionollacomun@gmail.com` con `replyTo` al estudiante.
+
+## Login / Registro con backend en Render
+
+Los botones **Iniciar sesión** y **Registrarse** están arriba a la derecha del navbar y abren `auth.html`, una página aparte. El formulario envía los datos a una API Node/Express desplegada en Render.
+
+### Endpoints
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `GET` | `/health` | Health check usado por Render. |
+| `POST` | `/api/register` | Crea cuenta con nombre, correo, contraseña y carrera opcional. |
+| `POST` | `/api/login` | Valida credenciales y devuelve un JWT de 7 días. |
+| `GET` | `/api/me` | Devuelve el usuario autenticado (header `Authorization: Bearer <token>`). |
+
+Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El token se guarda en `localStorage` y el navbar cambia a "Hola, nombre" + **Salir** cuando hay sesión activa.
+
+### Desplegar la API en Render
+
+1. En Render → **New +** → **Blueprint Instance** y conecta este repo de GitHub.
+2. Render detecta `render.yaml` y crea el servicio `ollacomun-auth` (plan free).
+3. La variable `JWT_SECRET` se genera automáticamente (`generateValue: true`).
+4. Espera a que el health check `/health` esté en verde.
+5. Copia la URL que te entrega Render (ej. `https://ollacomun-auth.onrender.com`) y, si es distinta, actualízala en `auth-config.js`. Luego haz push para que GitHub Pages y Cloudflare publiquen el cambio.
+
+> Si Render te asigna otra URL, también puedes definir `window.AUTH_API_URL` antes de cargar `auth.html` desde tu propio CDN. El valor por defecto ya coincide con el nombre del servicio del blueprint.
+
+### Probar la API en local
+
+```bash
+cd backend
+npm install
+copy .env.example .env   # Windows: usa "cp" en macOS/Linux
+npm start
+```
+
+Luego:
+
+```bash
+curl http://localhost:3000/health
+curl -X POST http://localhost:3000/api/register -H "Content-Type: application/json" -d "{\"name\":\"Ana\",\"email\":\"ana@udd.cl\",\"password\":\"secreto123\",\"carrera\":\"Arquitectura\"}"
+curl -X POST http://localhost:3000/api/login -H "Content-Type: application/json" -d "{\"email\":\"ana@udd.cl\",\"password\":\"secreto123\"}"
+```
+
+Para apuntar el frontend local a tu API, cambia `window.AUTH_API_URL` en `auth-config.js` a `http://localhost:3000`.
+
+> **Limitación del plan free:** Render apaga la instancia tras ~15 min de inactividad; el primer request puede tardar unos segundos. El archivo `backend/data/users.json` es efímero: si el servicio se reinicia, se pierden las cuentas. Para producción real, usa una base de datos de Render y un disco persistente.
 
 ## Desarrollo local
 
@@ -60,8 +110,8 @@ Cada push a `main` dispara el workflow y actualiza el sitio automáticamente.
 | Sin pagos en línea en el MVP | Copy explícito: "Sin pagos en la app · Trato directo en el campus · 0% comisión". |
 | No se permiten productos prohibidos | El catálogo de ejemplo solo muestra implementos académicos. |
 | Debe probarse a fin de semestre, cuando hay poca demanda | Hero enfocado en "vender antes de irte de vacaciones". |
-| Sin costo / planes gratuitos | Brevo y GitHub Pages en plan gratuito. |
-| Sin datos sensibles | No se piden RUT, contraseñas, ClaveÚnica, datos bancarios ni de salud. |
+| Sin costo / planes gratuitos | Brevo, GitHub Pages y Render en plan gratuito. |
+| Sin datos sensibles | No se piden RUT, ClaveÚnica, datos bancarios ni de salud. La contraseña del login se almacena solo como hash bcrypt. |
 
 ## Evidencia esperada (métricas)
 

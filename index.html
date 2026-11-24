@@ -59,6 +59,19 @@
         nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
         .logo { font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.6rem; color: var(--navy); }
         .logo-img { width: 46px; height: 46px; object-fit: contain; display: block; }
+        .nav-right { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; flex-wrap: wrap; }
+        .auth-buttons { display: flex; gap: 0.5rem; }
+        .btn-nav { display: inline-flex; align-items: center; justify-content: center; padding: 0.55rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; text-decoration: none; transition: all 0.15s ease; white-space: nowrap; }
+        .btn-login { color: var(--navy); border: 1.5px solid var(--navy); background: transparent; }
+        .btn-login:hover { background: var(--navy); color: white; }
+        .btn-signup { color: white; border: 1.5px solid var(--navy); background: var(--navy); }
+        .btn-signup:hover { background: var(--accent); border-color: var(--accent); }
+        .user-menu { display: flex; align-items: center; gap: 0.6rem; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--navy); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; }
+        #user-name { font-size: 0.88rem; font-weight: 700; color: var(--navy); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .btn-logout { padding: 0.45rem 0.8rem; font-size: 0.8rem; font-weight: 700; color: var(--accent); background: transparent; border: 1.5px solid var(--accent); border-radius: 999px; cursor: pointer; }
+        .btn-logout:hover { background: var(--accent); color: white; }
+        @media (max-width: 700px) { nav { flex-wrap: wrap; } .nav-right { width: 100%; } .campus-pill { display: none; } }
         .campus-pill { font-size: 0.78rem; font-weight: 600; padding: 0.35rem 0.85rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; }
         .pulse { width: 7px; height: 7px; background: var(--emerald); border-radius: 50%; box-shadow: 0 0 0 3px var(--emerald-soft); }
 
@@ -160,7 +173,18 @@
     <div class="container">
         <nav>
             <div class="logo"><img src="images/meco_logo.png" alt="Logo OllaComun" class="logo-img"> OllaComun</div>
-            <div class="campus-pill"><span class="pulse"></span> Piloto Fin de Semestre · UDD</div>
+            <div class="nav-right">
+                <div class="campus-pill"><span class="pulse"></span> Piloto Fin de Semestre · UDD</div>
+                <div id="auth-buttons" class="auth-buttons">
+                    <a class="btn-nav btn-login" href="auth.html?mode=login">Iniciar sesión</a>
+                    <a class="btn-nav btn-signup" href="auth.html?mode=register">Registrarse</a>
+                </div>
+                <div id="user-menu" class="user-menu" style="display:none">
+                    <span class="user-avatar" id="user-avatar"></span>
+                    <span id="user-name"></span>
+                    <button type="button" class="btn-logout" id="logout-btn">Salir</button>
+                </div>
+            </div>
         </nav>
 
         <main>
@@ -363,6 +387,7 @@
         <footer>OllaComun · Piloto Fin de Semestre · UDD · Sin pagos en la app · 0% comisión</footer>
     </div>
 
+    <script src="auth-config.js"></script>
     <!-- config.js se genera en GitHub Pages desde el secreto BREVO_API_KEY.
          Se carga por URL absoluta para que funcione también en Cloudflare Pages o en local. -->
     <script src="https://joaqalmonacid-star.github.io/PersaUDD/config.js?v=4"></script>
@@ -521,6 +546,32 @@
             navigator.clipboard.writeText(window.location.href);
             this.textContent = '¡Link copiado al portapapeles!';
             setTimeout(() => { this.textContent = 'Copiar link para compartir en tu grupo'; }, 2500);
+        });
+
+        // Estado de sesión del login (token guardado por auth.html)
+        function syncAuthUI() {
+            const token = localStorage.getItem('authToken');
+            let user = null;
+            try { user = JSON.parse(localStorage.getItem('authUser') || 'null'); } catch (e) { user = null; }
+            const authButtons = document.getElementById('auth-buttons');
+            const userMenu = document.getElementById('user-menu');
+            if (token && user) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                const label = user.name || user.email || 'Usuario';
+                document.getElementById('user-name').textContent = label;
+                document.getElementById('user-avatar').textContent = label.charAt(0).toUpperCase();
+            } else {
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        }
+
+        syncAuthUI();
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
+            syncAuthUI();
         });
     </script>
 </body>

@@ -182,11 +182,37 @@ async function sendWelcomeEmail(user) {
     }
 }
 
+function mongoDiagnostics() {
+    const uri = process.env.MONGODB_URI || '';
+    let host = '';
+    let userLength = 0;
+    try {
+        const parsed = new URL(uri);
+        host = parsed.host;
+        userLength = parsed.username.length;
+    } catch (err) {
+        host = '(URI no válida)';
+    }
+    const pwdMatch = uri.match(/:\/\/[^:/]+:([^@]*)@/);
+    let password = pwdMatch ? pwdMatch[1] : '';
+    try { password = decodeURIComponent(password); } catch (err) { /* se deja tal cual */ }
+    return {
+        mongoConfigured: Boolean(uri),
+        mongoHost: host,
+        mongoUserLength: userLength,
+        mongoPasswordLength: password.length,
+        mongoPasswordHasSpecialChars: /[^A-Za-z0-9]/.test(password),
+        mongoUriHasQuotes: uri.includes('"') || uri.includes("'"),
+        mongoUriHasPlaceholder: uri.includes('<')
+    };
+}
+
 app.get('/health', (req, res) => res.json({
     status: 'ok',
     service: 'ollacomun-auth',
     storage: store.getMode(),
     dbError: store.getError(),
+    ...mongoDiagnostics(),
     brevoConfigured: Boolean(BREVO_API_KEY),
     sender: BREVO_SENDER_EMAIL
 }));

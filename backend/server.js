@@ -203,7 +203,8 @@ function mongoDiagnostics() {
         mongoPasswordLength: password.length,
         mongoPasswordHasSpecialChars: /[^A-Za-z0-9]/.test(password),
         mongoUriHasQuotes: uri.includes('"') || uri.includes("'"),
-        mongoUriHasPlaceholder: uri.includes('<')
+        mongoUriHasPlaceholder: uri.includes('<'),
+        mongoUriRedacted: uri.replace(/(\:\/\/[^:/]+:)[^@]*(@)/, '$1***$2')
     };
 }
 

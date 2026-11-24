@@ -185,7 +185,8 @@ async function sendWelcomeEmail(user) {
 app.get('/health', (req, res) => res.json({
     status: 'ok',
     service: 'ollacomun-auth',
-    storage: store.USE_MONGO ? 'mongo' : 'file',
+    storage: store.getMode(),
+    dbError: store.getError(),
     brevoConfigured: Boolean(BREVO_API_KEY),
     sender: BREVO_SENDER_EMAIL
 }));
@@ -380,13 +381,12 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Error interno del servidor' });
 });
 
-(async () => {
-    try {
-        const storage = await store.init();
-        await store.seedProducts(SAMPLE_PRODUCTS);
-        app.listen(PORT, () => console.log(`OllaComun auth API escuchando en puerto ${PORT} (${storage})`));
-    } catch (err) {
-        console.error('No se pudo iniciar el servidor:', err);
-        process.exit(1);
-    }
-})();
+app.listen(PORT, () => {
+    console.log(`OllaComun auth API escuchando en puerto ${PORT}`);
+    store.init()
+        .then(async () => {
+            await store.seedProducts(SAMPLE_PRODUCTS);
+            console.log('Almacenamiento listo: ' + store.getMode());
+        })
+        .catch(err => console.error('Error al inicializar el almacenamiento:', err.message));
+});

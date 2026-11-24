@@ -10,6 +10,12 @@ const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 let client = null;
 let usersCol = null;
 let productsCol = null;
+let activeMode = 'file';
+let lastError = null;
+
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(USERS_FILE)) writeJson(USERS_FILE, []);
+if (!fs.existsSync(PRODUCTS_FILE)) writeJson(PRODUCTS_FILE, []);
 
 function readJson(file) {
     try {
@@ -26,38 +32,48 @@ function writeJson(file, data) {
 }
 
 async function init() {
-    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-    if (!fs.existsSync(USERS_FILE)) writeJson(USERS_FILE, []);
-    if (!fs.existsSync(PRODUCTS_FILE)) writeJson(PRODUCTS_FILE, []);
-
     if (!USE_MONGO) {
-        console.warn('MONGODB_URI no configurada: usando archivos JSON locales (solo para desarrollo).');
-        return 'file';
+        console.warn('MONGODB_URI no configurada: usando archivos JSON locales (solo desarrollo).');
+        return activeMode;
     }
 
-    client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
-    const db = client.db(process.env.MONGODB_DB || 'ollacomun');
-    usersCol = db.collection('users');
-    productsCol = db.collection('products');
-    await usersCol.createIndex({ email: 1 }, { unique: true });
-    await productsCol.createIndex({ createdAt: -1 });
-    console.log('Conectado a MongoDB (' + (process.env.MONGODB_DB || 'ollacomun') + ').');
-    return 'mongo';
+    try {
+        client = new MongoClient(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 10000,
+            connectTimeoutMS: 10000
+        });
+        await client.connect();
+        const db = client.db(process.env.MONGODB_DB || 'ollacomun');
+        usersCol = db.collection('users');
+        productsCol = db.collection('products');
+        await usersCol.createIndex({ email: 1 }, { unique: true });
+        await productsCol.createIndex({ createdAt: -1 });
+        activeMode = 'mongo';
+        lastError = null;
+        console.log('Conectado a MongoDB (' + (process.env.MONGODB_DB || 'ollacomun') + ').');
+    } catch (err) {
+        lastError = err.message;
+        console.error('No se pudo conectar a MongoDB. Se usa almacenamiento local temporal:', err.message);
+    }
+    return activeMode;
 }
 
+function isMongo() { return activeMode === 'mongo'; }
+function getMode() { return activeMode; }
+function getError() { return lastError; }
+
 async function findUserByEmail(email) {
-    if (USE_MONGO) return usersCol.findOne({ email });
+    if (isMongo()) return usersCol.findOne({ email });
     return readJson(USERS_FILE).find(u => u.email === email) || null;
 }
 
 async function findUserById(id) {
-    if (USE_MONGO) return usersCol.findOne({ id });
+    if (isMongo()) return usersCol.findOne({ id });
     return readJson(USERS_FILE).find(u => u.id === id) || null;
 }
 
 async function createUser(user) {
-    if (USE_MONGO) return usersCol.insertOne(user);
+    if (isMongo()) return usersCol.insertOne(user);
     const users = readJson(USERS_FILE);
     users.push(user);
     writeJson(USERS_FILE, users);
@@ -65,7 +81,7 @@ async function createUser(user) {
 }
 
 async function updateUser(id, patch) {
-    if (USE_MONGO) {
+    if (isMongo()) {
         await usersCol.updateOne({ id }, { $set: patch });
         return usersCol.findOne({ id });
     }
@@ -78,17 +94,17 @@ async function updateUser(id, patch) {
 }
 
 async function listProducts() {
-    if (USE_MONGO) return productsCol.find({}).sort({ createdAt: -1 }).toArray();
+    if (isMongo()) return productsCol.find({}).sort({ createdAt: -1 }).toArray();
     return readJson(PRODUCTS_FILE).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
 }
 
 async function findProductById(id) {
-    if (USE_MONGO) return productsCol.findOne({ id });
+    if (isMongo()) return productsCol.findOne({ id });
     return readJson(PRODUCTS_FILE).find(p => p.id === id) || null;
 }
 
 async function createProduct(product) {
-    if (USE_MONGO) return productsCol.insertOne(product);
+    if (isMongo()) return productsCol.insertOne(product);
     const products = readJson(PRODUCTS_FILE);
     products.push(product);
     writeJson(PRODUCTS_FILE, products);
@@ -96,7 +112,7 @@ async function createProduct(product) {
 }
 
 async function updateProduct(id, patch) {
-    if (USE_MONGO) {
+    if (isMongo()) {
         await productsCol.updateOne({ id }, { $set: patch });
         return productsCol.findOne({ id });
     }
@@ -109,7 +125,7 @@ async function updateProduct(id, patch) {
 }
 
 async function seedProducts(samples) {
-    const existing = USE_MONGO ? await productsCol.countDocuments() : readJson(PRODUCTS_FILE).length;
+    const existing = isMongo() ? await productsCol.countDocuments() : readJson(PRODUCTS_FILE).length;
     if (existing > 0) return;
 
     const now = new Date().toISOString();
@@ -123,7 +139,7 @@ async function seedProducts(samples) {
         updatedAt: now
     }));
 
-    if (USE_MONGO) {
+    if (isMongo()) {
         await productsCol.insertMany(seeded);
     } else {
         writeJson(PRODUCTS_FILE, seeded);
@@ -133,6 +149,8 @@ async function seedProducts(samples) {
 module.exports = {
     USE_MONGO,
     init,
+    getMode,
+    getError,
     findUserByEmail,
     findUserById,
     createUser,

@@ -87,7 +87,7 @@ function normalizeImages(value, fallbackImage) {
             return { error: 'Las fotos deben ser imágenes JPG, PNG o WebP' };
         }
         const bytes = Buffer.byteLength(str.split(',')[1], 'base64');
-        if (bytes > MAX_PHOTO_BYTES) return { error: 'Cada foto debe pesar menos de 1.5 MB' };
+        if (bytes > MAX_PHOTO_BYTES) return { error: 'Cada foto debe pesar menos de 1.6 MB' };
         images.push(str);
     }
 

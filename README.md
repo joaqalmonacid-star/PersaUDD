@@ -79,7 +79,7 @@ Cada tarjeta del mercado abre `producto.html?id=...` con la ficha completa del p
 
 ### Publicación, edición y filtros
 
-- El botón **+ Publicar producto** (arriba a la derecha) abre `publicar.html`, donde se ingresan todos los datos y se suben hasta **5 fotos desde el dispositivo**. Las imágenes se redimensionan en el navegador y se guardan como data URI en MongoDB; no se usa ningún servicio de imágenes externo.
+- El botón **+ Publicar producto** (arriba a la derecha) abre `publicar.html`, donde se ingresan todos los datos y se suben hasta **5 fotos desde el dispositivo**. Se aceptan archivos de entrada de hasta **30 MB**; el navegador las comprime progresivamente y las guarda como data URI en MongoDB; no se usa ningún servicio de imágenes externo.
 - En **Mi perfil → Mis publicaciones** cada producto es clicable y tiene acciones rápidas: **Disponible**, **Reservado**, **Vendido**, **No disponible**, **Editar** (panel en línea) y **Editar todo** (`publicar.html?edit=id`).
 - El menú de filtros está a la **izquierda** y es desplegable (`<details>`); en móvil arranca cerrado, se oculta al elegir una categoría y desplaza la página hasta las publicaciones.
 - La **vitrina personalizada** muestra, sobre la barra buscadora, un carrusel deslizante con productos disponibles de la misma carrera que tiene el usuario en su perfil.

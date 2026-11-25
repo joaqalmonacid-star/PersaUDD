@@ -13,7 +13,7 @@ const BREVO_SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL || 'administracionolla
 const BREVO_SENDER_NAME = process.env.BREVO_SENDER_NAME || 'OllaComun';
 const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
-const CAREERS = ['Arquitectura', 'Ingeniería', 'Salud', 'Ing. Comercial', 'Derecho', 'Educación', 'Otra'];
+const CAREERS = ['Arquitectura', 'Ingeniería', 'Salud', 'Medicina', 'Ing. Comercial', 'Derecho', 'Educación', 'Otra'];
 const TYPES = ['Libros y guías', 'Calculadoras', 'Material de maqueta', 'Batas y laboratorio', 'Cables y tecnología', 'Instrumentos de dibujo', 'Otro'];
 const FUNCTIONS = ['Estudio', 'Laboratorio', 'Taller', 'Uso diario', 'Otro'];
 const STATUSES = ['disponible', 'reservado', 'vendido', 'no_disponible'];

@@ -202,12 +202,16 @@ function isAdminEmail(email) {
 
 function requireAdmin(req, res, next) {
     requireAuth(req, res, async () => {
-        const user = await store.findUserById(req.auth.sub);
-        if (!user || !isAdminEmail(user.email)) {
-            return res.status(403).json({ error: 'No autorizado' });
+        try {
+            const user = await store.findUserById(req.auth.sub);
+            if (!user || !isAdminEmail(user.email)) {
+                return res.status(403).json({ error: 'No autorizado' });
+            }
+            req.admin = user;
+            next();
+        } catch (err) {
+            next(err);
         }
-        req.admin = user;
-        next();
     });
 }
 

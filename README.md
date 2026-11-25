@@ -68,6 +68,8 @@ El backend crea automáticamente las colecciones `users` y `products`, el índic
 | `POST` | `/api/products` | Publica un producto con hasta 5 fotos en base64 (requiere sesión). |
 | `PUT` | `/api/products/:id` | Edita un producto propio. |
 | `PATCH` | `/api/products/:id/status` | Cambia el estado y agrega una entrada al historial. |
+| `DELETE` | `/api/products/:id` | Elimina una publicación propia o cualquiera desde la cuenta `joaq.almonacid@gmail.com`. |
+| `GET` | `/api/admin/products` | Lista todas las publicaciones con datos del vendedor para `admin.html`. |
 
 Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El token JWT se guarda en `localStorage`.
 

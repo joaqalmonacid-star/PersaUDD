@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Panel de administración de OllaComun.">
+    <title>OllaComun · Panel de administrador</title>
+    <link rel="icon" type="image/png" href="images/meco_logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff; --navy: #00295b; --ink: #000027; --red: #ed1c24;
+            --green: #005f02; --cyan: #29abe2; --yellow: #fcee21;
+            --surface: var(--white); --text-muted: rgba(0, 41, 91, 0.72);
+            --border: rgba(0, 41, 91, 0.16); --radius-lg: 16px; --radius-md: 12px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+        body {
+            min-height: 100vh; color: var(--ink); line-height: 1.55; -webkit-font-smoothing: antialiased;
+            background-color: var(--white);
+            background-image:
+                radial-gradient(ellipse 70% 45% at 6% 0%, rgba(41,171,226,0.20) 0%, rgba(41,171,226,0) 100%),
+                radial-gradient(ellipse 60% 40% at 100% 8%, rgba(0,41,91,0.12) 0%, rgba(0,41,91,0) 100%);
+            background-attachment: fixed;
+        }
+        .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 2rem 1.5rem 5rem; }
+        a { color: inherit; }
+        nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.75rem; }
+        .logo { font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.6rem; color: var(--navy); text-decoration: none; }
+        .logo-img { width: 46px; height: 46px; object-fit: contain; }
+        .back-link { color: var(--navy); text-decoration: none; font-weight: 700; font-size: 0.9rem; }
+        .back-link:hover { color: var(--red); }
+        h1 { font-size: clamp(1.8rem, 4vw, 2.3rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+        .sub { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 1.5rem; }
+        .search-wrap { position: relative; max-width: 620px; margin-bottom: 1.5rem; }
+        .search-box { display: flex; align-items: center; gap: 0.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 0.4rem 0.5rem 0.4rem 0.4rem; box-shadow: 0 14px 30px -16px rgba(0,41,91,0.35); }
+        .search-box input { flex: 1; border: none; outline: none; padding: 0.65rem 1rem; font-size: 0.95rem; background: transparent; color: var(--ink); min-width: 0; }
+        .btn-search { width: 40px; height: 40px; flex: 0 0 40px; border: none; border-radius: 50%; background: var(--navy); color: white; font-size: 1.05rem; cursor: pointer; }
+        .btn-search:hover { background: var(--red); }
+        .count { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .admin-card { display: grid; grid-template-columns: 130px 1fr; gap: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; box-shadow: 0 16px 32px -18px rgba(0,41,91,0.25); }
+        .admin-card img { width: 130px; height: 130px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .admin-body { min-width: 0; }
+        .admin-cat { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); }
+        .admin-name { font-size: 1.05rem; font-weight: 800; margin: 0.2rem 0 0.35rem; }
+        .admin-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .admin-meta { font-size: 0.78rem; color: var(--text-muted); }
+        .admin-meta strong { color: var(--navy); }
+        .badge-row { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+        .status-badge { font-size: 0.66rem; font-weight: 700; padding: 0.25rem 0.6rem; border-radius: 999px; }
+        .status-disponible { background: rgba(0,95,2,0.10); color: var(--green); }
+        .status-reservado { background: rgba(252,238,33,0.45); color: var(--navy); }
+        .status-vendido { background: rgba(0,41,91,0.08); color: var(--navy); }
+        .status-no_disponible { background: rgba(237,28,36,0.10); color: var(--red); }
+        .price { font-size: 0.95rem; font-weight: 800; color: var(--navy); }
+        .btn-delete { margin-top: 0.7rem; padding: 0.45rem 0.85rem; border: 1.5px solid var(--red); border-radius: 999px; background: transparent; color: var(--red); font-size: 0.76rem; font-weight: 800; cursor: pointer; }
+        .btn-delete:hover { background: var(--red); color: white; }
+        .message { min-height: 1.2em; margin-top: 0.75rem; font-size: 0.85rem; font-weight: 700; }
+        .message.ok { color: var(--green); } .message.error { color: var(--red); }
+        .empty { color: var(--text-muted); font-size: 0.92rem; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+        @media (max-width: 560px) {
+            .container { padding: 1.25rem 1rem 3rem; }
+            nav { flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
+            .logo { font-size: 1.2rem; }
+            .logo-img { width: 38px; height: 38px; }
+            .admin-card { grid-template-columns: 1fr; }
+            .admin-card img { width: 100%; height: 180px; }
+            .search-box input { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a class="logo" href="index.html"><img src="images/meco_logo.png" alt="Logo OllaComun" class="logo-img"> OllaComun</a>
+            <a class="back-link" href="index.html">← Volver al inicio</a>
+        </nav>
+
+        <h1>Panel de administrador</h1>
+        <p class="sub">Publicaciones de OllaComun.</p>
+
+        <div class="search-wrap">
+            <div class="search-box">
+                <input type="search" id="admin-search" placeholder="Buscar por producto, categoría o vendedor" autocomplete="off">
+                <button type="button" class="btn-search" id="admin-search-btn" aria-label="Buscar">🔍</button>
+            </div>
+        </div>
+
+        <div id="admin-count" class="count">Cargando...</div>
+        <div id="admin-message" class="message" role="status" aria-live="polite"></div>
+        <div id="admin-grid" class="grid"></div>
+    </div>
+
+    <script src="auth-config.js"></script>
+    <script src="product-form.js"></script>
+    <script>
+        const API = String(window.AUTH_API_URL || '').replace(/\/$/, '');
+        const token = localStorage.getItem('authToken');
+        const grid = document.getElementById('admin-grid');
+        const countBox = document.getElementById('admin-count');
+        const message = document.getElementById('admin-message');
+        const searchInput = document.getElementById('admin-search');
+        let products = [];
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+        }
+
+        function showMessage(text, kind) {
+            message.textContent = text;
+            message.className = 'message ' + (kind || '');
+        }
+
+        if (!token) location.href = 'auth.html?mode=login';
+
+        const labels = {
+            disponible: '● Disponible',
+            reservado: '◐ Reservado',
+            vendido: '✓ Vendido',
+            no_disponible: '✕ No disponible'
+        };
+
+        function matches(p, term) {
+            if (!term) return true;
+            const seller = p.seller || {};
+            return [p.name, p.description, p.carrera, p.tipo, p.funcionalidad, p.place,
+                seller.name, seller.email, seller.telefono]
+                .join(' ').toLowerCase().includes(term);
+        }
+
+        function render(list) {
+            countBox.textContent = list.length + (list.length === 1 ? ' publicación' : ' publicaciones');
+            if (!list.length) {
+                grid.innerHTML = '<p class="empty">No hay publicaciones para mostrar.</p>';
+                return;
+            }
+            grid.innerHTML = list.map(p => {
+                const seller = p.seller || {};
+                const status = p.status || 'disponible';
+                return `
+                    <article class="admin-card" data-id="${escapeHtml(p.id)}">
+                        <img src="${escapeHtml(window.OllaProductForm.imageSrc(p))}" alt="${escapeHtml(p.name)}">
+                        <div class="admin-body">
+                            <span class="admin-cat">${escapeHtml(p.carrera)} · ${escapeHtml(p.tipo)} · ${escapeHtml(p.funcionalidad)}</span>
+                            <div class="admin-name">${escapeHtml(p.name)}</div>
+                            <p class="admin-desc">${escapeHtml(p.description)}</p>
+                            <p class="admin-meta"><strong>Vendido por:</strong> ${escapeHtml(seller.name || '—')}</p>
+                            <p class="admin-meta"><strong>Correo:</strong> ${escapeHtml(seller.email || '—')}</p>
+                            <p class="admin-meta"><strong>Teléfono:</strong> ${escapeHtml(seller.telefono || '—')}</p>
+                            <p class="admin-meta"><strong>Entrega:</strong> ${escapeHtml(p.place)} · ${new Date(p.createdAt).toLocaleDateString('es-CL')}</p>
+                            <div class="badge-row">
+                                <span class="price">$${Number(p.price).toLocaleString('es-CL')}</span>
+                                <span class="status-badge status-${escapeHtml(status)}">${escapeHtml(labels[status] || status)}</span>
+                            </div>
+                            <button type="button" class="btn-delete">Eliminar</button>
+                        </div>
+                    </article>`;
+            }).join('');
+
+            grid.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', () => removeProduct(button.closest('.admin-card').dataset.id));
+            });
+        }
+
+        async function removeProduct(id) {
+            const product = products.find(item => item.id === id);
+            if (!window.confirm('¿Eliminar "' + (product ? product.name : 'esta publicación') + '"?')) return;
+            try {
+                const res = await fetch(API + '/api/products/' + encodeURIComponent(id), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'No se pudo eliminar la publicación');
+                products = products.filter(item => item.id !== id);
+                render(products.filter(p => matches(p, searchInput.value.trim().toLowerCase())));
+                showMessage('Publicación eliminada.', 'ok');
+            } catch (err) {
+                showMessage(err.message, 'error');
+            }
+        }
+
+        async function init() {
+            try {
+                const res = await fetch(API + '/api/admin/products', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.status === 401) {
+                    location.href = 'auth.html?mode=login';
+                    return;
+                }
+                if (res.status === 403) {
+                    location.href = 'index.html';
+                    return;
+                }
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'No se pudieron cargar las publicaciones');
+                products = data.products || [];
+                render(products);
+            } catch (err) {
+                countBox.textContent = '';
+                grid.innerHTML = '<p class="empty">' + escapeHtml(err.message) + '</p>';
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            const term = searchInput.value.trim().toLowerCase();
+            render(products.filter(p => matches(p, term)));
+        });
+        document.getElementById('admin-search-btn').addEventListener('click', () => {
+            const term = searchInput.value.trim().toLowerCase();
+            render(products.filter(p => matches(p, term)));
+        });
+
+        init();
+    </script>
+</body>
+</html>

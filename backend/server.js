@@ -102,7 +102,8 @@ function publicUser(user) {
         email: user.email,
         carrera: user.carrera,
         telefono: user.telefono,
-        createdAt: user.createdAt
+        createdAt: user.createdAt,
+        isAdmin: user.email === ADMIN_EMAIL
     };
 }
 
@@ -152,6 +153,33 @@ function publicProductDetail(product, seller) {
     };
 }
 
+function adminProduct(product, owner) {
+    const sellerName = owner
+        ? [owner.name, owner.apellido].filter(Boolean).join(' ')
+        : (product.ownerName || 'Comunidad OllaComun');
+    return {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        carrera: product.carrera,
+        tipo: product.tipo,
+        funcionalidad: product.funcionalidad,
+        place: product.place,
+        status: product.status,
+        image: product.image,
+        images: Array.isArray(product.images) ? product.images : [],
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+        seller: {
+            name: sellerName,
+            email: owner ? owner.email : null,
+            telefono: owner ? owner.telefono : null,
+            carrera: owner ? owner.carrera : (product.ownerCarrera || '')
+        }
+    };
+}
+
 function tokenFor(user) {
     return jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 }
@@ -166,6 +194,21 @@ function requireAuth(req, res, next) {
     } catch (err) {
         return res.status(401).json({ error: 'Sesión inválida o expirada' });
     }
+}
+
+function isAdminEmail(email) {
+    return String(email || '').toLowerCase() === ADMIN_EMAIL;
+}
+
+function requireAdmin(req, res, next) {
+    requireAuth(req, res, async () => {
+        const user = await store.findUserById(req.auth.sub);
+        if (!user || !isAdminEmail(user.email)) {
+            return res.status(403).json({ error: 'No autorizado' });
+        }
+        req.admin = user;
+        next();
+    });
 }
 
 function validateProfile(body) {
@@ -427,6 +470,18 @@ app.get('/api/products', async (req, res) => {
     res.json({ products: products.map(publicProduct) });
 });
 
+app.get('/api/admin/products', requireAdmin, async (req, res) => {
+    const products = await store.listProducts();
+    const result = [];
+    for (const product of products) {
+        const owner = product.ownerId && product.ownerId !== 'demo'
+            ? await store.findUserById(product.ownerId)
+            : null;
+        result.push(adminProduct(product, owner));
+    }
+    res.json({ products: result });
+});
+
 app.get('/api/products/:id', async (req, res) => {
     const product = await store.findProductById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
@@ -561,6 +616,17 @@ app.put('/api/products/:id', requireAuth, async (req, res) => {
         updatedAt: now
     });
     res.json({ product: publicProduct(updated) });
+});
+
+app.delete('/api/products/:id', requireAuth, async (req, res) => {
+    const product = await store.findProductById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
+    if (product.ownerId !== req.auth.sub && !isAdminEmail(req.auth.email)) {
+        return res.status(403).json({ error: 'No puedes eliminar este producto' });
+    }
+    const deleted = await store.deleteProduct(product.id);
+    if (!deleted) return res.status(404).json({ error: 'Producto no encontrado' });
+    res.json({ ok: true });
 });
 
 app.use((err, req, res, next) => {

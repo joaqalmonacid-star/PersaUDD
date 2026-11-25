@@ -124,6 +124,18 @@ async function updateProduct(id, patch) {
     return products[index];
 }
 
+async function deleteProduct(id) {
+    if (isMongo()) {
+        const result = await productsCol.deleteOne({ id });
+        return result.deletedCount > 0;
+    }
+    const products = readJson(PRODUCTS_FILE);
+    const next = products.filter(p => p.id !== id);
+    if (next.length === products.length) return false;
+    writeJson(PRODUCTS_FILE, next);
+    return true;
+}
+
 async function seedProducts(samples) {
     const existing = isMongo() ? await productsCol.countDocuments() : readJson(PRODUCTS_FILE).length;
     if (existing > 0) return;
@@ -159,5 +171,6 @@ module.exports = {
     findProductById,
     createProduct,
     updateProduct,
+    deleteProduct,
     seedProducts
 };

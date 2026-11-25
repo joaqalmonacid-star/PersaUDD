@@ -119,7 +119,6 @@ function publicProduct(product) {
         image: product.image,
         images: Array.isArray(product.images) ? product.images : [],
         status: product.status,
-        statusHistory: product.statusHistory || [],
         ownerId: product.ownerId,
         ownerName: product.ownerName,
         createdAt: product.createdAt,

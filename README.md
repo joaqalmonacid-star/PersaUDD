@@ -73,13 +73,14 @@ Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El toke
 
 ### Detalle y contacto de productos
 
-Cada tarjeta del mercado abre `producto.html?id=...` con la ficha completa del producto, galería de fotos y su historial de estados. La vista pública del vendedor contiene **solo nombre y carrera**: correo, teléfono y demás datos personales nunca se envían al navegador. El botón **Contactar** requiere sesión y el backend toma los datos del comprador desde la base de datos (no del formulario), por lo que no se pueden falsificar. El correo se envía desde `administracionollacomun@gmail.com` con `replyTo` apuntando al comprador. Para los 6 productos de demostración, el destinatario es el equipo OllaComun.
+Cada tarjeta del mercado abre `producto.html?id=...` con la ficha completa del producto y su galería de fotos. El historial de estados se conserva solo en el backend y **no se envía ni se muestra al usuario**. La vista pública del vendedor contiene **solo nombre y carrera**: correo, teléfono y demás datos personales nunca se envían al navegador. El botón **Contactar** requiere sesión y el backend toma los datos del comprador desde la base de datos (no del formulario), por lo que no se pueden falsificar. El correo se envía desde `administracionollacomun@gmail.com` con `replyTo` apuntando al comprador. Para los 6 productos de demostración, el destinatario es el equipo OllaComun.
 
 ### Publicación, edición y filtros
 
 - El botón **+ Publicar producto** (arriba a la derecha) abre `publicar.html`, donde se ingresan todos los datos y se suben hasta **5 fotos desde el dispositivo**. Las imágenes se redimensionan en el navegador y se guardan como data URI en MongoDB; no se usa ningún servicio de imágenes externo.
 - En **Mi perfil → Mis publicaciones** cada producto es clicable y tiene acciones rápidas: **Disponible**, **Reservado**, **Vendido**, **No disponible**, **Editar** (panel en línea) y **Editar todo** (`publicar.html?edit=id`).
-- El menú de filtros está a la **izquierda** y es desplegable (`<details>`); en móvil arranca cerrado para no ocupar la pantalla.
+- El menú de filtros está a la **izquierda** y es desplegable (`<details>`); en móvil arranca cerrado, se oculta al elegir una categoría y desplaza la página hasta las publicaciones.
+- La **vitrina personalizada** muestra, sobre la barra buscadora, un carrusel deslizante con productos disponibles de la misma carrera que tiene el usuario en su perfil.
 - El buscador incluye botón de lupa y sugerencias en vivo con los nombres de productos que coinciden; al hacer clic en una sugerencia se abre su ficha.
 - Los estados posibles son `disponible`, `reservado`, `vendido` y `no_disponible`.
 

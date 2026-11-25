@@ -63,11 +63,27 @@
         .dropdown-content button { color: var(--red); border-top: 1px solid var(--border); }
 
         /* Hero compacto */
-        .hero { margin-bottom: 2.25rem; }
+        .hero { margin-bottom: 1.35rem; }
         .eyebrow { display: inline-block; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); background: var(--accent-soft); padding: 0.35rem 0.75rem; border-radius: 6px; margin-bottom: 1rem; }
         h1 { font-size: clamp(2rem, 4vw, 2.9rem); font-weight: 800; letter-spacing: -0.04em; line-height: 1.12; margin-bottom: 0.7rem; }
         .lead { font-size: 1.02rem; color: var(--text-muted); max-width: 70ch; }
-        .hero-points { list-style: none; display: flex; flex-wrap: wrap; gap: 0.6rem 1.4rem; margin-top: 1.1rem; font-size: 0.88rem; color: var(--text-muted); }
+
+        /* Vitrina personalizada */
+        .showcase { margin-bottom: 1.15rem; }
+        .showcase-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.7rem; }
+        .showcase-head h2 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
+        .showcase-label { font-size: 0.72rem; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; }
+        .showcase-controls { display: flex; gap: 0.4rem; }
+        .showcase-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--navy); font-size: 1.05rem; line-height: 1; cursor: pointer; }
+        .showcase-btn:hover { background: var(--navy); color: white; }
+        .showcase-track { display: flex; gap: 0.85rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding: 0.2rem 0.2rem 0.7rem; scrollbar-width: thin; }
+        .showcase-card { flex: 0 0 190px; scroll-snap-align: start; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; color: inherit; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .showcase-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -12px rgba(0,41,91,0.25); }
+        .showcase-card img { width: 100%; height: 104px; object-fit: cover; display: block; border-bottom: 1px solid var(--border); }
+        .showcase-card-body { padding: 0.6rem 0.7rem 0.7rem; }
+        .showcase-card strong { display: block; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .showcase-card span { display: block; margin-top: 0.25rem; font-size: 0.8rem; font-weight: 800; color: var(--navy); }
+        .hero-points { list-style: none; display: flex; flex-wrap: wrap; gap: 0.55rem 1.4rem; margin: 0 0 1.5rem; font-size: 0.88rem; color: var(--text-muted); }
         .hero-points li::before { content: '✓'; color: var(--emerald); font-weight: 800; margin-right: 0.4rem; }
 
         /* Buscador arriba al centro */
@@ -138,20 +154,28 @@
         }
         @media (max-width: 560px) {
             .container { padding: 1.25rem 1rem 3rem; }
-            nav { align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; }
-            .nav-right { width: 100%; justify-content: flex-start; }
+            nav { align-items: center; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.5rem; }
+            .nav-right { width: 100%; flex-wrap: nowrap; gap: 0.35rem; justify-content: space-between; }
+            .auth-buttons { gap: 0.35rem; }
+            .btn-publish-top, .btn-nav { padding: 0.45rem 0.6rem; font-size: 0.75rem; }
+            .user-name-btn { padding: 0.25rem 0.45rem 0.25rem 0.25rem; font-size: 0.75rem; gap: 0.35rem; }
+            .user-avatar { width: 24px; height: 24px; font-size: 0.7rem; }
+            .caret { display: none; }
             .campus-pill { display: none; }
             .logo { font-size: 1.2rem; }
             .logo-img { width: 38px; height: 38px; }
-            .hero { margin-bottom: 1.75rem; }
+            .hero { margin-bottom: 1.1rem; }
             h1 { font-size: clamp(1.7rem, 8vw, 2.2rem); }
+            .showcase-head { align-items: flex-end; }
+            .showcase-card { flex-basis: 165px; }
+            .hero-points { gap: 0.45rem 1rem; font-size: 0.82rem; margin-bottom: 1.25rem; }
             .search-box { border-radius: var(--radius-lg); }
             .search-box input[type="search"] { font-size: 16px; }
             .btn-search { width: 40px; height: 40px; flex-basis: 40px; }
             .market-layout { gap: 1rem; }
             .product-grid { grid-template-columns: 1fr; }
             .product-thumb { height: 210px; }
-            #user-name { max-width: 110px; }
+            #user-name { max-width: 78px; }
         }
         footer { text-align: center; margin-top: 3.5rem; font-size: 0.8rem; color: var(--text-muted); }
     </style>
@@ -184,14 +208,29 @@
 
         <section class="hero">
             <span class="eyebrow">Mercado Estudiantil Verificado</span>
-            <h1>Vende tus cosas de ramo antes de irte de vacaciones.</h1>
+            <h1>Lo que ya no usas, otro estudiante lo aprovecha.</h1>
             <p class="lead">Busca implementos usados por nombre o categoría, publica los tuyos en segundos y entrega entre clases dentro del campus.</p>
-            <ul class="hero-points">
-                <li>100% comunidad UDD</li>
-                <li>Estado en tiempo real: disponible, reservado, vendido o no disponible</li>
-                <li>Sin pagos en la app ni comisión</li>
-            </ul>
         </section>
+
+        <section id="showcase" class="showcase" hidden>
+            <div class="showcase-head">
+                <div>
+                    <span class="showcase-label">Vitrina para ti</span>
+                    <h2 id="showcase-title">Productos de tu carrera</h2>
+                </div>
+                <div class="showcase-controls">
+                    <button type="button" class="showcase-btn" id="showcase-prev" aria-label="Ver anteriores">‹</button>
+                    <button type="button" class="showcase-btn" id="showcase-next" aria-label="Ver siguientes">›</button>
+                </div>
+            </div>
+            <div id="showcase-track" class="showcase-track"></div>
+        </section>
+
+        <ul class="hero-points">
+            <li>100% comunidad UDD</li>
+            <li>Estado en tiempo real: disponible, reservado, vendido o no disponible</li>
+            <li>Sin pagos en la app ni comisión</li>
+        </ul>
 
         <section class="search-section">
             <div class="search-wrap">
@@ -313,6 +352,10 @@
                     activeFilter.group = button.dataset.group;
                     activeFilter.value = button.dataset.value;
                     loadProducts();
+                    if (window.innerWidth <= 900) {
+                        document.getElementById('filter-panel').removeAttribute('open');
+                        document.querySelector('.products-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 });
             });
         }
@@ -406,9 +449,53 @@
             if (!e.target.closest('.search-wrap')) hideSuggestions();
         });
 
+        /* ---------- Vitrina personalizada por carrera ---------- */
+        async function loadShowcase() {
+            if (!token) return;
+            const section = document.getElementById('showcase');
+            const track = document.getElementById('showcase-track');
+            try {
+                const meRes = await fetch(API + '/api/me', { headers: authHeaders() });
+                if (!meRes.ok) return;
+                const meData = await meRes.json();
+                const carrera = meData.user && meData.user.carrera;
+                if (!carrera) return;
+
+                const res = await fetch(API + '/api/products?carrera=' + encodeURIComponent(carrera));
+                const data = await res.json();
+                const items = (data.products || [])
+                    .filter(p => p.status !== 'vendido' && p.status !== 'no_disponible')
+                    .slice(0, 12);
+
+                document.getElementById('showcase-title').textContent = 'Productos de ' + carrera;
+                if (!items.length) {
+                    track.innerHTML = '<p class="empty">Aún no hay productos disponibles de ' + escapeHtml(carrera) + '.</p>';
+                } else {
+                    track.innerHTML = items.map(p => `
+                        <a class="showcase-card" href="producto.html?id=${encodeURIComponent(p.id)}">
+                            <img src="${escapeHtml(window.OllaProductForm.imageSrc(p))}" alt="${escapeHtml(p.name)}">
+                            <div class="showcase-card-body">
+                                <strong>${escapeHtml(p.name)}</strong>
+                                <span>$${Number(p.price).toLocaleString('es-CL')}</span>
+                            </div>
+                        </a>`).join('');
+                }
+                section.hidden = false;
+                document.getElementById('showcase-prev').addEventListener('click', () => {
+                    track.scrollBy({ left: -210, behavior: 'smooth' });
+                });
+                document.getElementById('showcase-next').addEventListener('click', () => {
+                    track.scrollBy({ left: 210, behavior: 'smooth' });
+                });
+            } catch (err) {
+                section.hidden = true;
+            }
+        }
+
         /* ---------- Inicio ---------- */
         syncAuthUI();
         if (window.innerWidth <= 900) document.getElementById('filter-panel').removeAttribute('open');
+        loadShowcase();
         (async () => {
             try {
                 const res = await fetch(API + '/api/categories');

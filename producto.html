@@ -88,11 +88,6 @@
         .message { min-height: 1.3em; margin-top: 0.75rem; font-size: 0.86rem; font-weight: 700; }
         .message.ok { color: var(--green); }
         .message.error { color: var(--red); }
-        .history { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); }
-        .history h3 { font-size: 0.85rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; }
-        .history ul { list-style: none; }
-        .history li { font-size: 0.8rem; color: var(--text-muted); padding: 0.2rem 0; }
-        .history li::before { content: '•'; color: var(--cyan); font-weight: 800; margin-right: 0.45rem; }
         .empty { color: var(--text-muted); font-size: 0.95rem; }
         footer { text-align: center; margin-top: 3rem; font-size: 0.8rem; color: var(--text-muted); }
 
@@ -199,9 +194,6 @@
             const status = p.status || 'disponible';
             const gallery = window.OllaProductForm.imageSrc(p);
             const extra = (p.images || []).slice(1);
-            const history = (p.statusHistory || []).map(h =>
-                `<li>${escapeHtml(labels[h.status] || h.status)} · ${new Date(h.at).toLocaleString('es-CL')}</li>`
-            ).join('') || '<li>Sin cambios registrados</li>';
 
             content.innerHTML = `
                 <div class="detail-media">
@@ -231,11 +223,6 @@
                     <button type="button" id="contact-btn" class="btn-contact">Contactar</button>
                     <div id="contact-status" class="message" role="status" aria-live="polite"></div>
                     <p class="privacy-note">Al contactar, el vendedor recibirá tu nombre, apellido, carrera y teléfono registrados en tu perfil.</p>
-
-                    <div class="history">
-                        <h3>Historial de estado</h3>
-                        <ul>${history}</ul>
-                    </div>
                 </div>`;
 
             content.querySelectorAll('.detail-thumb').forEach(thumb => {

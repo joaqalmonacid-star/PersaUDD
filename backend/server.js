@@ -105,6 +105,32 @@ function publicProduct(product) {
     };
 }
 
+async function sellerForProduct(product) {
+    const owner = product.ownerId ? await store.findUserById(product.ownerId) : null;
+    if (owner) {
+        return {
+            id: owner.id,
+            email: owner.email,
+            name: [owner.name, owner.apellido].filter(Boolean).join(' '),
+            carrera: owner.carrera || ''
+        };
+    }
+    return {
+        id: product.ownerId || null,
+        email: null,
+        name: product.ownerName || 'Comunidad OllaComun',
+        carrera: product.ownerCarrera || 'Comunidad UDD'
+    };
+}
+
+function publicProductDetail(product, seller) {
+    const { ownerId, ownerName, ...rest } = publicProduct(product);
+    return {
+        ...rest,
+        seller: { name: seller.name, carrera: seller.carrera, isDemo: !seller.email }
+    };
+}
+
 function tokenFor(user) {
     return jwt.sign({ sub: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 }
@@ -178,6 +204,65 @@ async function sendWelcomeEmail(user) {
         return { sent: true };
     } catch (err) {
         console.error('Error al enviar correo de confirmación:', err.message);
+        return { sent: false, reason: err.message };
+    }
+}
+
+async function sendContactEmail(product, buyer, sellerEmail, isDemo) {
+    if (!BREVO_API_KEY) return { sent: false, reason: 'BREVO_API_KEY no configurada' };
+
+    const siteUrl = 'https://joaqalmonacid-star.github.io/PersaUDD/';
+    const subject = `Contacto por "${product.name}" · OllaComun`;
+    const buyerFullName = [buyer.name, buyer.apellido].filter(Boolean).join(' ');
+    const demoNote = isDemo
+        ? '<p style="font-size:13px;color:#666">Este producto es de demostración: el mensaje fue enviado al equipo OllaComun.</p>'
+        : '';
+
+    const htmlContent = `
+        <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;color:#000027;line-height:1.6">
+            <h1 style="color:#00295b;font-size:24px;margin:0 0 12px">Te contactaron desde OllaComun</h1>
+            <p>Una estudiante quiere saber más sobre tu publicación <strong>${escapeHtml(product.name)}</strong>.</p>
+            <div style="background:#f5f9ff;border-left:4px solid #29abe2;padding:14px 18px;margin:18px 0">
+                <p style="margin:0 0 6px"><strong>Datos de contacto de quien te escribió:</strong></p>
+                <p style="margin:2px 0">Nombre: ${escapeHtml(buyer.name || '')}</p>
+                <p style="margin:2px 0">Apellido: ${escapeHtml(buyer.apellido || '')}</p>
+                <p style="margin:2px 0">Carrera: ${escapeHtml(buyer.carrera || '')}</p>
+                <p style="margin:2px 0">Teléfono: ${escapeHtml(buyer.telefono || '')}</p>
+            </div>
+            ${demoNote}
+            <p><strong>Producto:</strong> ${escapeHtml(product.name)} · $${Number(product.price).toLocaleString('es-CL')} · ${escapeHtml(product.place)}</p>
+            <p style="color:#005f02"><strong>Recuerda:</strong> acuerda la entrega directamente en el campus. OllaComun no recibe pagos ni comisiones.</p>
+            <p style="font-size:12px;color:#666666">${escapeHtml(buyerFullName)} usó OllaComun para contactarte: ${siteUrl}</p>
+        </div>`;
+    const textContent = `Te contactaron desde OllaComun por "${product.name}". ` +
+        `Datos de contacto: ${buyerFullName}, ${buyer.carrera || ''}, ${buyer.telefono || ''}. ` +
+        `Producto: ${product.name}, $${Number(product.price).toLocaleString('es-CL')}, ${product.place}.`;
+
+    try {
+        const response = await fetch(BREVO_API_URL, {
+            method: 'POST',
+            headers: {
+                'api-key': BREVO_API_KEY,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: { name: BREVO_SENDER_NAME, email: BREVO_SENDER_EMAIL },
+                to: [{ email: sellerEmail }],
+                replyTo: { email: buyer.email, name: buyerFullName },
+                subject,
+                htmlContent,
+                textContent
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Brevo rechazó el correo de contacto:', response.status, await response.text());
+            return { sent: false, reason: 'Brevo respondió ' + response.status };
+        }
+        return { sent: true };
+    } catch (err) {
+        console.error('Error al enviar correo de contacto:', err.message);
         return { sent: false, reason: err.message };
     }
 }
@@ -316,6 +401,42 @@ app.get('/api/products', async (req, res) => {
     }
 
     res.json({ products: products.map(publicProduct) });
+});
+
+app.get('/api/products/:id', async (req, res) => {
+    const product = await store.findProductById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
+    const seller = await sellerForProduct(product);
+    res.json({ product: publicProductDetail(product, seller) });
+});
+
+app.post('/api/products/:id/contact', requireAuth, async (req, res) => {
+    const product = await store.findProductById(req.params.id);
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    const buyer = await store.findUserById(req.auth.sub);
+    if (!buyer) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    const seller = await sellerForProduct(product);
+    if (seller.id && seller.id === buyer.id) {
+        return res.status(400).json({ error: 'No puedes contactarte a ti mismo' });
+    }
+
+    const recipient = seller.email || BREVO_SENDER_EMAIL;
+    if (!recipient) return res.status(400).json({ error: 'El vendedor no tiene correo disponible' });
+    if (!BREVO_API_KEY) return res.status(503).json({ error: 'El correo no está disponible en este momento. Intenta más tarde.' });
+
+    const result = await sendContactEmail(product, buyer, recipient, !seller.email);
+    if (!result.sent) return res.status(502).json({ error: 'No se pudo enviar el correo. Intenta nuevamente.' });
+
+    res.json({
+        ok: true,
+        emailSent: true,
+        demo: !seller.email,
+        message: !seller.email
+            ? 'Producto de demostración: enviamos tu mensaje al equipo OllaComun.'
+            : 'Enviamos tu nombre, apellido, carrera y teléfono al vendedor.'
+    });
 });
 
 app.post('/api/products', requireAuth, async (req, res) => {

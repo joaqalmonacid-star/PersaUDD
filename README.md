@@ -63,11 +63,17 @@ El backend crea automáticamente las colecciones `users` y `products`, el índic
 | `GET` | `/api/me` | Datos del usuario autenticado. |
 | `PUT` | `/api/me` | Actualiza nombre, apellido, correo, carrera y teléfono. |
 | `GET` | `/api/products` | Lista productos. Filtros: `q`, `carrera`, `tipo`, `funcionalidad`, `status`, `mine=true`. |
+| `GET` | `/api/products/:id` | Detalle del producto. Del vendedor solo expone `name` y `carrera`. |
+| `POST` | `/api/products/:id/contact` | Envía por Brevo un correo al vendedor con nombre, apellido, carrera y teléfono del comprador autenticado (requiere sesión). |
 | `POST` | `/api/products` | Publica un producto (requiere sesión). |
 | `PUT` | `/api/products/:id` | Edita un producto propio. |
 | `PATCH` | `/api/products/:id/status` | Cambia el estado y agrega una entrada al historial. |
 
 Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El token JWT se guarda en `localStorage`.
+
+### Detalle y contacto de productos
+
+Cada tarjeta del mercado abre `producto.html?id=...` con la ficha completa del producto y su historial de estados. La vista pública del vendedor contiene **solo nombre y carrera**: correo, teléfono y demás datos personales nunca se envían al navegador. El botón **Contactar** requiere sesión y el backend toma los datos del comprador desde la base de datos (no del formulario), por lo que no se pueden falsificar. El correo se envía desde `administracionollacomun@gmail.com` con `replyTo` apuntando al comprador. Para los 6 productos de demostración, el destinatario es el equipo OllaComun.
 
 ## Variables de entorno del backend
 

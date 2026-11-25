@@ -1,7 +1,7 @@
 // Utilidades compartidas para cargar fotos de productos desde el dispositivo.
 window.OllaProductForm = (function () {
     const MAX_PHOTOS = 5;
-    const MAX_INPUT_BYTES = 30 * 1024 * 1024;
+    const MAX_INPUT_BYTES = 30 * 1024 * 1024; // fotos de entrada pesadas se comprimen antes de guardarse
     const MAX_OUTPUT_BYTES = 1.6 * 1024 * 1024;
 
     function encodeImage(img, maxSide, quality) {

@@ -18,7 +18,7 @@ const TYPES = ['Libros y guías', 'Calculadoras', 'Material de maqueta', 'Batas 
 const FUNCTIONS = ['Estudio', 'Laboratorio', 'Taller', 'Uso diario', 'Otro'];
 const STATUSES = ['disponible', 'reservado', 'vendido', 'no_disponible'];
 const IMAGES = ['calculadora.jpg', 'reglas.jpg', 'libro.jpg', 'bata.jpg', 'cables.jpg', 'instrumentos.jpg'];
-const ADMIN_EMAIL = 'joaq.almonacid@gmail.com';
+const ADMIN_EMAILS = ['joaq.almonacid@gmail.com', 'number-emit-waking@duck.com'];
 const MAX_PHOTOS = 5;
 const MAX_PHOTO_BYTES = 1.6 * 1024 * 1024;
 
@@ -103,7 +103,7 @@ function publicUser(user) {
         carrera: user.carrera,
         telefono: user.telefono,
         createdAt: user.createdAt,
-        isAdmin: user.email === ADMIN_EMAIL
+        isAdmin: ADMIN_EMAILS.includes(String(user.email || '').toLowerCase())
     };
 }
 
@@ -197,7 +197,7 @@ function requireAuth(req, res, next) {
 }
 
 function isAdminEmail(email) {
-    return String(email || '').toLowerCase() === ADMIN_EMAIL;
+    return ADMIN_EMAILS.includes(String(email || '').toLowerCase());
 }
 
 function requireAdmin(req, res, next) {
@@ -226,7 +226,7 @@ function validateProfile(body) {
     if (data.name.length < 2) return { error: 'Ingresa tu nombre' };
     if (data.apellido.length < 2) return { error: 'Ingresa tu apellido' };
     if (!EMAIL_RE.test(data.email)) return { error: 'Ingresa un correo válido' };
-    if (data.email !== ADMIN_EMAIL && !data.email.endsWith('@udd.cl')) {
+    if (!ADMIN_EMAILS.includes(data.email) && !data.email.endsWith('@udd.cl')) {
         return { error: 'Debes usar tu correo institucional @udd.cl' };
     }
     if (data.carrera.length < 2) return { error: 'Ingresa tu carrera' };

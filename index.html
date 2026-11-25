@@ -315,7 +315,8 @@
                 document.getElementById('user-avatar').textContent = (user.name || user.email || '?').charAt(0).toUpperCase();
                 const adminLink = document.getElementById('admin-link');
                 if (adminLink) {
-                    adminLink.style.display = (user.isAdmin || String(user.email || '').toLowerCase() === 'joaq.almonacid@gmail.com') ? 'block' : 'none';
+                    const adminEmails = ['joaq.almonacid@gmail.com', 'number-emit-waking@duck.com'];
+                    adminLink.style.display = (user.isAdmin || adminEmails.includes(String(user.email || '').toLowerCase())) ? 'block' : 'none';
                 }
             } else {
                 authButtons.style.display = 'flex';

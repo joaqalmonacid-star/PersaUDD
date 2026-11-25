@@ -58,7 +58,7 @@ El backend crea automáticamente las colecciones `users` y `products`, el índic
 | --- | --- | --- |
 | `GET` | `/health` | Estado, tipo de storage, si Brevo está configurado y remitente. |
 | `GET` | `/api/categories` | Listas de carreras, tipos, funcionalidades, estados e imágenes. |
-| `POST` | `/api/register` | Crea cuenta con los 5 datos obligatorios + contraseña; solo correos `@udd.cl` (excepto el admin `joaq.almonacid@gmail.com`); envía correo Brevo. |
+| `POST` | `/api/register` | Crea cuenta con los 5 datos obligatorios + contraseña; solo correos `@udd.cl` (excepto `joaq.almonacid@gmail.com` y `number-emit-waking@duck.com`); envía correo Brevo. |
 | `POST` | `/api/login` | Valida credenciales y devuelve JWT de 7 días. |
 | `GET` | `/api/me` | Datos del usuario autenticado. |
 | `PUT` | `/api/me` | Actualiza nombre, apellido, correo `@udd.cl`, carrera y teléfono. |
@@ -68,7 +68,7 @@ El backend crea automáticamente las colecciones `users` y `products`, el índic
 | `POST` | `/api/products` | Publica un producto con hasta 5 fotos en base64 (requiere sesión). |
 | `PUT` | `/api/products/:id` | Edita un producto propio. |
 | `PATCH` | `/api/products/:id/status` | Cambia el estado y agrega una entrada al historial. |
-| `DELETE` | `/api/products/:id` | Elimina una publicación propia o cualquiera desde la cuenta `joaq.almonacid@gmail.com`. |
+| `DELETE` | `/api/products/:id` | Elimina una publicación propia o cualquiera desde las cuentas `joaq.almonacid@gmail.com` o `number-emit-waking@duck.com`. |
 | `GET` | `/api/admin/products` | Lista todas las publicaciones con datos del vendedor para `admin.html`. |
 
 Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El token JWT se guarda en `localStorage`.

@@ -214,7 +214,8 @@
 
             if (mode === 'register') {
                 const email = String(payload.email || '').toLowerCase();
-                if (email !== 'joaq.almonacid@gmail.com' && !email.endsWith('@udd.cl')) {
+                const adminEmails = ['joaq.almonacid@gmail.com', 'number-emit-waking@duck.com'];
+                if (!adminEmails.includes(email) && !email.endsWith('@udd.cl')) {
                     showMessage('Debes usar tu correo institucional @udd.cl.', 'error');
                     return;
                 }

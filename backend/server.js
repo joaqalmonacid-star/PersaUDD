@@ -16,8 +16,11 @@ const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 const CAREERS = ['Arquitectura', 'Ingeniería', 'Salud', 'Ing. Comercial', 'Derecho', 'Educación', 'Otra'];
 const TYPES = ['Libros y guías', 'Calculadoras', 'Material de maqueta', 'Batas y laboratorio', 'Cables y tecnología', 'Instrumentos de dibujo', 'Otro'];
 const FUNCTIONS = ['Estudio', 'Laboratorio', 'Taller', 'Uso diario', 'Otro'];
-const STATUSES = ['disponible', 'reservado', 'vendido'];
+const STATUSES = ['disponible', 'reservado', 'vendido', 'no_disponible'];
 const IMAGES = ['calculadora.jpg', 'reglas.jpg', 'libro.jpg', 'bata.jpg', 'cables.jpg', 'instrumentos.jpg'];
+const ADMIN_EMAIL = 'joaq.almonacid@gmail.com';
+const MAX_PHOTOS = 5;
+const MAX_PHOTO_BYTES = 1.6 * 1024 * 1024;
 
 const SAMPLE_PRODUCTS = [
     {
@@ -63,7 +66,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json({ limit: '20kb' }));
+app.use(express.json({ limit: '12mb' }));
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -71,6 +74,24 @@ function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (char) => ({
         '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[char]));
+}
+
+function normalizeImages(value, fallbackImage) {
+    const raw = Array.isArray(value) ? value : [];
+    if (raw.length > MAX_PHOTOS) return { error: `Máximo ${MAX_PHOTOS} fotos por producto` };
+
+    const images = [];
+    for (const item of raw) {
+        const str = String(item || '');
+        if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(str)) {
+            return { error: 'Las fotos deben ser imágenes JPG, PNG o WebP' };
+        }
+        const bytes = Buffer.byteLength(str.split(',')[1], 'base64');
+        if (bytes > MAX_PHOTO_BYTES) return { error: 'Cada foto debe pesar menos de 1.5 MB' };
+        images.push(str);
+    }
+
+    return { images, image: images[0] || fallbackImage || IMAGES[0] };
 }
 
 function publicUser(user) {
@@ -96,6 +117,7 @@ function publicProduct(product) {
         funcionalidad: product.funcionalidad,
         place: product.place,
         image: product.image,
+        images: Array.isArray(product.images) ? product.images : [],
         status: product.status,
         statusHistory: product.statusHistory || [],
         ownerId: product.ownerId,
@@ -158,6 +180,9 @@ function validateProfile(body) {
     if (data.name.length < 2) return { error: 'Ingresa tu nombre' };
     if (data.apellido.length < 2) return { error: 'Ingresa tu apellido' };
     if (!EMAIL_RE.test(data.email)) return { error: 'Ingresa un correo válido' };
+    if (data.email !== ADMIN_EMAIL && !data.email.endsWith('@udd.cl')) {
+        return { error: 'Debes usar tu correo institucional @udd.cl' };
+    }
     if (data.carrera.length < 2) return { error: 'Ingresa tu carrera' };
     if (data.telefono.length < 6) return { error: 'Ingresa tu teléfono' };
     return { data };
@@ -448,7 +473,9 @@ app.post('/api/products', requireAuth, async (req, res) => {
     const tipo = String(body.tipo || '');
     const funcionalidad = String(body.funcionalidad || '');
     const place = String(body.place || '').trim();
-    const image = IMAGES.includes(body.image) ? body.image : IMAGES[0];
+    const photoResult = normalizeImages(body.images, null);
+    if (photoResult.error) return res.status(400).json({ error: photoResult.error });
+    if (!photoResult.images.length) return res.status(400).json({ error: 'Sube al menos una foto del producto' });
 
     if (name.length < 3) return res.status(400).json({ error: 'Ingresa el nombre del producto' });
     if (description.length < 10) return res.status(400).json({ error: 'Describe el producto (mínimo 10 caracteres)' });
@@ -464,7 +491,9 @@ app.post('/api/products', requireAuth, async (req, res) => {
     const now = new Date().toISOString();
     const product = {
         id: crypto.randomUUID(),
-        name, description, price, carrera, tipo, funcionalidad, place, image,
+        name, description, price, carrera, tipo, funcionalidad, place,
+        image: photoResult.image,
+        images: photoResult.images,
         status: 'disponible',
         statusHistory: [{ status: 'disponible', at: now }],
         ownerId: owner.id,
@@ -507,6 +536,14 @@ app.put('/api/products/:id', requireAuth, async (req, res) => {
     const tipo = String(body.tipo || '');
     const funcionalidad = String(body.funcionalidad || '');
     const place = String(body.place || '').trim();
+    const photoResult = normalizeImages(body.images, product.image);
+    if (photoResult.error) return res.status(400).json({ error: photoResult.error });
+    if (!photoResult.images.length) return res.status(400).json({ error: 'El producto debe tener al menos una foto' });
+    const status = STATUSES.includes(body.status) ? body.status : product.status;
+    const now = new Date().toISOString();
+    const statusHistory = status === product.status
+        ? (product.statusHistory || [])
+        : [...(product.statusHistory || []), { status, at: now }];
 
     if (name.length < 3) return res.status(400).json({ error: 'Ingresa el nombre del producto' });
     if (description.length < 10) return res.status(400).json({ error: 'Describe el producto (mínimo 10 caracteres)' });
@@ -518,8 +555,11 @@ app.put('/api/products/:id', requireAuth, async (req, res) => {
 
     const updated = await store.updateProduct(product.id, {
         name, description, price, carrera, tipo, funcionalidad, place,
-        image: IMAGES.includes(body.image) ? body.image : product.image,
-        updatedAt: new Date().toISOString()
+        image: photoResult.image,
+        images: photoResult.images,
+        status,
+        statusHistory,
+        updatedAt: now
     });
     res.json({ product: publicProduct(updated) });
 });

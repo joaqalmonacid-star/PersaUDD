@@ -29,6 +29,8 @@ jobs:
           cp perfil.html site/perfil.html
           cp soporte.html site/soporte.html
           cp producto.html site/producto.html
+          cp publicar.html site/publicar.html
+          cp product-form.js site/product-form.js
           cp auth-config.js site/auth-config.js
           cp -r images site/images
           touch site/.nojekyll

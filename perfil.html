@@ -49,11 +49,34 @@
         .btn:disabled { opacity: .6; cursor: wait; }
         .message { min-height: 1.3em; margin-top: 1rem; font-size: 0.88rem; font-weight: 700; }
         .message.ok { color: var(--green); } .message.error { color: var(--red); }
-        .my-product { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--border); }
+        .my-product { padding: 1rem 0; border-bottom: 1px solid var(--border); }
         .my-product:last-child { border-bottom: none; }
-        .my-product strong { display: block; }
-        .my-product small { color: var(--text-muted); }
-        .status-select { width: auto; padding: 0.5rem 0.7rem; font-size: 0.85rem; }
+        .my-product-main { display: flex; align-items: center; gap: 0.9rem; }
+        .my-product-thumb { width: 68px; height: 68px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
+        .my-product-info { flex: 1; min-width: 0; }
+        .my-product-info a { color: var(--navy); font-weight: 800; text-decoration: none; }
+        .my-product-info a:hover { color: var(--red); }
+        .my-product-info small { display: block; color: var(--text-muted); }
+        .status-badge { display: inline-block; margin-top: 0.3rem; font-size: 0.68rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 999px; }
+        .status-disponible { background: rgba(0,95,2,0.10); color: var(--green); }
+        .status-reservado { background: rgba(252,238,33,0.45); color: var(--navy); }
+        .status-vendido { background: rgba(0,41,91,0.08); color: var(--navy); }
+        .status-no_disponible { background: rgba(237,28,36,0.10); color: var(--red); }
+        .quick-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem; }
+        .quick-btn { padding: 0.4rem 0.7rem; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--navy); font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+        .quick-btn:hover { background: rgba(41,171,226,0.12); }
+        .quick-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+        .quick-btn.danger { color: var(--red); }
+        .edit-panel { display: none; margin-top: 0.9rem; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); background: rgba(41,171,226,0.05); }
+        .edit-panel.open { display: block; }
+        .edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        .edit-grid .full { grid-column: 1 / -1; }
+        .edit-grid label { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .edit-grid input, .edit-grid select, .edit-grid textarea { width: 100%; padding: 0.6rem 0.7rem; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; font-family: inherit; color: var(--ink); background: var(--surface); }
+        .edit-grid textarea { min-height: 70px; resize: vertical; }
+        .edit-previews { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+        .edit-previews img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+        .edit-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; }
         .empty { color: var(--text-muted); font-size: 0.9rem; }
         @media (max-width: 640px) {
             .container { padding: 1.25rem 1rem 3rem; }
@@ -61,11 +84,11 @@
             .logo { font-size: 1.2rem; }
             .logo-img { width: 38px; height: 38px; }
             h1 { font-size: 1.7rem; }
-            form { grid-template-columns: 1fr; }
+            form, .edit-grid { grid-template-columns: 1fr; }
             .card { padding: 1.25rem; }
-            .my-product { flex-direction: column; align-items: flex-start; }
-            .status-select { width: 100%; }
-            input, select { font-size: 16px; }
+            .my-product-thumb { width: 56px; height: 56px; }
+            .edit-grid .full { grid-column: auto; }
+            input, select, textarea { font-size: 16px; }
         }
     </style>
 </head>
@@ -85,7 +108,7 @@
                 <div class="field"><label class="field-label" for="apellido">Apellido</label><input type="text" id="apellido" required></div>
                 <div class="field"><label class="field-label" for="carrera">Carrera</label><input type="text" id="carrera" list="carreras-list" required></div>
                 <div class="field"><label class="field-label" for="telefono">Teléfono</label><input type="tel" id="telefono" required></div>
-                <div class="field full"><label class="field-label" for="email">Correo</label><input type="email" id="email" required></div>
+                <div class="field full"><label class="field-label" for="email">Correo</label><input type="email" id="email" required><span class="hint" style="font-size:.76rem;color:var(--text-muted)">Debe ser @udd.cl (excepto el administrador).</span></div>
                 <div class="field full"><button type="submit" class="btn" id="save-btn">Guardar cambios</button></div>
             </form>
             <datalist id="carreras-list">
@@ -102,11 +125,20 @@
     </div>
 
     <script src="auth-config.js"></script>
+    <script src="product-form.js"></script>
     <script>
         const API = String(window.AUTH_API_URL || '').replace(/\/$/, '');
         const token = localStorage.getItem('authToken');
         const message = document.getElementById('message');
         const form = document.getElementById('profile-form');
+        let myProducts = [];
+        const editImages = {};
+        const STATUS_INFO = {
+            disponible: { label: '● Disponible', cls: 'status-disponible' },
+            reservado: { label: '◐ Reservado', cls: 'status-reservado' },
+            vendido: { label: '✓ Vendido', cls: 'status-vendido' },
+            no_disponible: { label: '✕ No disponible', cls: 'status-no_disponible' }
+        };
 
         function showMessage(text, kind) {
             message.textContent = text;
@@ -138,37 +170,181 @@
             }
         }
 
+        function statusOptions(selected) {
+            return Object.entries(STATUS_INFO).map(([value, info]) =>
+                `<option value="${value}" ${value === selected ? 'selected' : ''}>${info.label.replace(/^.*? /, '')}</option>`
+            ).join('');
+        }
+
+        function editPanelHtml(p) {
+            return `
+                <div class="edit-panel" id="edit-${escapeHtml(p.id)}">
+                    <div class="edit-grid">
+                        <div class="full"><label>Nombre</label><input class="e-name" value="${escapeHtml(p.name)}"></div>
+                        <div class="full"><label>Descripción</label><textarea class="e-desc">${escapeHtml(p.description)}</textarea></div>
+                        <div><label>Precio (CLP)</label><input class="e-price" type="number" min="0" value="${Number(p.price)}"></div>
+                        <div><label>Lugar de entrega</label><input class="e-place" value="${escapeHtml(p.place)}"></div>
+                        <div><label>Carrera</label><input class="e-carrera" value="${escapeHtml(p.carrera)}"></div>
+                        <div><label>Tipo</label><input class="e-tipo" value="${escapeHtml(p.tipo)}"></div>
+                        <div><label>Funcionalidad</label><input class="e-func" value="${escapeHtml(p.funcionalidad)}"></div>
+                        <div><label>Estado</label><select class="e-status">${statusOptions(p.status)}</select></div>
+                        <div class="full"><label>Fotos (máx. ${window.OllaProductForm.MAX_PHOTOS})</label>
+                            <input class="e-files" type="file" accept="image/*" multiple>
+                            <div class="edit-previews"></div>
+                        </div>
+                    </div>
+                    <div class="edit-actions">
+                        <button type="button" class="btn e-save">Guardar cambios</button>
+                        <button type="button" class="quick-btn e-cancel">Cancelar</button>
+                    </div>
+                </div>`;
+        }
+
+        function renderEditPreviews(id) {
+            const panel = document.getElementById('edit-' + id);
+            if (!panel) return;
+            const box = panel.querySelector('.edit-previews');
+            const list = editImages[id] || [];
+            box.innerHTML = list.map((src, index) => `
+                <div style="position:relative">
+                    <img src="${escapeHtml(src)}" alt="Foto ${index + 1}">
+                    <button type="button" class="quick-btn danger e-remove" data-index="${index}" style="position:absolute;top:-6px;right:-6px;padding:0 6px">×</button>
+                </div>`).join('') || '<span class="empty">Sin fotos cargadas</span>';
+            box.querySelectorAll('.e-remove').forEach(button => {
+                button.addEventListener('click', () => {
+                    editImages[id].splice(Number(button.dataset.index), 1);
+                    renderEditPreviews(id);
+                });
+            });
+        }
+
+        async function openEdit(id) {
+            const product = myProducts.find(item => item.id === id);
+            const panel = document.getElementById('edit-' + id);
+            if (!product || !panel) return;
+            panel.classList.add('open');
+            if (!editImages[id]) {
+                editImages[id] = Array.isArray(product.images) ? product.images.slice() : [];
+                if (!editImages[id].length && product.image) {
+                    try {
+                        const blob = await fetch('images/' + product.image).then(r => r.blob());
+                        const file = new File([blob], product.image, { type: blob.type || 'image/jpeg' });
+                        editImages[id] = [await window.OllaProductForm.fileToDataUrl(file)];
+                    } catch (err) {
+                        editImages[id] = [];
+                    }
+                }
+            }
+            renderEditPreviews(id);
+        }
+
+        async function saveEdit(id) {
+            const panel = document.getElementById('edit-' + id);
+            const value = selector => panel.querySelector(selector).value.trim();
+            const button = panel.querySelector('.e-save');
+            if (!(editImages[id] || []).length) {
+                showMessage('El producto debe tener al menos una foto.', 'error');
+                return;
+            }
+            button.disabled = true;
+            button.textContent = 'Guardando...';
+            try {
+                const res = await fetch(API + '/api/products/' + encodeURIComponent(id), {
+                    method: 'PUT', headers: authHeaders(),
+                    body: JSON.stringify({
+                        name: value('.e-name'),
+                        description: value('.e-desc'),
+                        price: Number(value('.e-price')),
+                        place: value('.e-place'),
+                        carrera: value('.e-carrera'),
+                        tipo: value('.e-tipo'),
+                        funcionalidad: value('.e-func'),
+                        status: panel.querySelector('.e-status').value,
+                        images: editImages[id]
+                    })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'No se pudo guardar');
+                showMessage('Producto actualizado correctamente.', 'ok');
+                await loadMyProducts();
+            } catch (err) {
+                showMessage(err.message, 'error');
+                button.disabled = false;
+                button.textContent = 'Guardar cambios';
+            }
+        }
+
+        async function setProductStatus(id, status) {
+            try {
+                const res = await fetch(API + '/api/products/' + encodeURIComponent(id) + '/status', {
+                    method: 'PATCH', headers: authHeaders(),
+                    body: JSON.stringify({ status })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || 'No se pudo actualizar el estado');
+                showMessage('Estado actualizado correctamente.', 'ok');
+                await loadMyProducts();
+            } catch (err) {
+                showMessage(err.message, 'error');
+            }
+        }
+
         async function loadMyProducts() {
             const box = document.getElementById('my-products');
             try {
                 const res = await fetch(API + '/api/products?mine=true', { headers: authHeaders() });
                 if (!res.ok) throw new Error('No se pudieron cargar tus publicaciones');
                 const data = await res.json();
-                if (!data.products.length) {
-                    box.innerHTML = '<p class="empty">Aún no tienes publicaciones. Usa el botón «Publicar producto» en el inicio.</p>';
+                myProducts = data.products;
+                if (!myProducts.length) {
+                    box.innerHTML = '<p class="empty">Aún no tienes publicaciones. Usa el botón «Publicar producto» de arriba a la derecha.</p>';
                     return;
                 }
-                box.innerHTML = data.products.map(p => `
-                    <div class="my-product">
-                        <div><strong>${escapeHtml(p.name)}</strong><small>$${Number(p.price).toLocaleString('es-CL')} · Publicado el ${new Date(p.createdAt).toLocaleDateString('es-CL')}</small></div>
-                        <select class="status-select" data-id="${p.id}">
-                            <option value="disponible" ${p.status === 'disponible' ? 'selected' : ''}>Disponible</option>
-                            <option value="reservado" ${p.status === 'reservado' ? 'selected' : ''}>Reservado</option>
-                            <option value="vendido" ${p.status === 'vendido' ? 'selected' : ''}>Vendido</option>
-                        </select>
-                    </div>`).join('');
+                box.innerHTML = myProducts.map(p => {
+                    const info = STATUS_INFO[p.status] || STATUS_INFO.disponible;
+                    const link = 'producto.html?id=' + encodeURIComponent(p.id);
+                    return `
+                    <div class="my-product" data-id="${escapeHtml(p.id)}">
+                        <div class="my-product-main">
+                            <a href="${link}"><img class="my-product-thumb" src="${escapeHtml(window.OllaProductForm.imageSrc(p))}" alt="${escapeHtml(p.name)}"></a>
+                            <div class="my-product-info">
+                                <a href="${link}">${escapeHtml(p.name)}</a>
+                                <small>$${Number(p.price).toLocaleString('es-CL')} · Publicado el ${new Date(p.createdAt).toLocaleDateString('es-CL')}</small>
+                                <span class="status-badge ${info.cls}">${info.label}</span>
+                            </div>
+                        </div>
+                        <div class="quick-actions">
+                            <button type="button" class="quick-btn ${p.status === 'disponible' ? 'active' : ''}" data-status="disponible">Disponible</button>
+                            <button type="button" class="quick-btn ${p.status === 'reservado' ? 'active' : ''}" data-status="reservado">Reservado</button>
+                            <button type="button" class="quick-btn ${p.status === 'vendido' ? 'active' : ''}" data-status="vendido">Vendido</button>
+                            <button type="button" class="quick-btn danger ${p.status === 'no_disponible' ? 'active' : ''}" data-status="no_disponible">No disponible</button>
+                            <button type="button" class="quick-btn" data-action="edit">Editar</button>
+                            <button type="button" class="quick-btn" data-action="full-edit">Editar todo</button>
+                        </div>
+                        ${editPanelHtml(p)}
+                    </div>`;
+                }).join('');
 
-                box.querySelectorAll('.status-select').forEach(select => {
-                    select.addEventListener('change', async () => {
+                box.querySelectorAll('.my-product').forEach(row => {
+                    const id = row.dataset.id;
+                    row.querySelectorAll('[data-status]').forEach(button => {
+                        button.addEventListener('click', () => setProductStatus(id, button.dataset.status));
+                    });
+                    row.querySelector('[data-action="edit"]').addEventListener('click', () => openEdit(id));
+                    row.querySelector('[data-action="full-edit"]').addEventListener('click', () => {
+                        location.href = 'publicar.html?edit=' + encodeURIComponent(id);
+                    });
+                    const panel = row.querySelector('.edit-panel');
+                    panel.querySelector('.e-cancel').addEventListener('click', () => panel.classList.remove('open'));
+                    panel.querySelector('.e-save').addEventListener('click', () => saveEdit(id));
+                    panel.querySelector('.e-files').addEventListener('change', async (e) => {
                         try {
-                            const res = await fetch(API + '/api/products/' + select.dataset.id + '/status', {
-                                method: 'PATCH', headers: authHeaders(),
-                                body: JSON.stringify({ status: select.value })
-                            });
-                            if (!res.ok) throw new Error('No se pudo actualizar el estado');
-                            showMessage('Estado actualizado correctamente.', 'ok');
+                            editImages[id] = await window.OllaProductForm.filesToImages(e.target.files, editImages[id] || []);
+                            e.target.value = '';
+                            renderEditPreviews(id);
                         } catch (err) {
                             showMessage(err.message, 'error');
+                            e.target.value = '';
                         }
                     });
                 });
@@ -208,6 +384,8 @@
             }
         });
 
+        const publishedMessage = new URLSearchParams(location.search).get('msg');
+        if (publishedMessage) showMessage(publishedMessage, 'ok');
         loadProfile();
         loadMyProducts();
     </script>

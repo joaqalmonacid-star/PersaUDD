@@ -58,14 +58,14 @@ El backend crea automáticamente las colecciones `users` y `products`, el índic
 | --- | --- | --- |
 | `GET` | `/health` | Estado, tipo de storage, si Brevo está configurado y remitente. |
 | `GET` | `/api/categories` | Listas de carreras, tipos, funcionalidades, estados e imágenes. |
-| `POST` | `/api/register` | Crea cuenta con los 5 datos obligatorios + contraseña; envía correo Brevo. |
+| `POST` | `/api/register` | Crea cuenta con los 5 datos obligatorios + contraseña; solo correos `@udd.cl` (excepto el admin `joaq.almonacid@gmail.com`); envía correo Brevo. |
 | `POST` | `/api/login` | Valida credenciales y devuelve JWT de 7 días. |
 | `GET` | `/api/me` | Datos del usuario autenticado. |
-| `PUT` | `/api/me` | Actualiza nombre, apellido, correo, carrera y teléfono. |
+| `PUT` | `/api/me` | Actualiza nombre, apellido, correo `@udd.cl`, carrera y teléfono. |
 | `GET` | `/api/products` | Lista productos. Filtros: `q`, `carrera`, `tipo`, `funcionalidad`, `status`, `mine=true`. |
 | `GET` | `/api/products/:id` | Detalle del producto. Del vendedor solo expone `name` y `carrera`. |
 | `POST` | `/api/products/:id/contact` | Envía por Brevo un correo al vendedor con nombre, apellido, carrera y teléfono del comprador autenticado (requiere sesión). |
-| `POST` | `/api/products` | Publica un producto (requiere sesión). |
+| `POST` | `/api/products` | Publica un producto con hasta 5 fotos en base64 (requiere sesión). |
 | `PUT` | `/api/products/:id` | Edita un producto propio. |
 | `PATCH` | `/api/products/:id/status` | Cambia el estado y agrega una entrada al historial. |
 
@@ -73,7 +73,15 @@ Las contraseñas se guardan con **bcrypt** (hash, nunca en texto plano). El toke
 
 ### Detalle y contacto de productos
 
-Cada tarjeta del mercado abre `producto.html?id=...` con la ficha completa del producto y su historial de estados. La vista pública del vendedor contiene **solo nombre y carrera**: correo, teléfono y demás datos personales nunca se envían al navegador. El botón **Contactar** requiere sesión y el backend toma los datos del comprador desde la base de datos (no del formulario), por lo que no se pueden falsificar. El correo se envía desde `administracionollacomun@gmail.com` con `replyTo` apuntando al comprador. Para los 6 productos de demostración, el destinatario es el equipo OllaComun.
+Cada tarjeta del mercado abre `producto.html?id=...` con la ficha completa del producto, galería de fotos y su historial de estados. La vista pública del vendedor contiene **solo nombre y carrera**: correo, teléfono y demás datos personales nunca se envían al navegador. El botón **Contactar** requiere sesión y el backend toma los datos del comprador desde la base de datos (no del formulario), por lo que no se pueden falsificar. El correo se envía desde `administracionollacomun@gmail.com` con `replyTo` apuntando al comprador. Para los 6 productos de demostración, el destinatario es el equipo OllaComun.
+
+### Publicación, edición y filtros
+
+- El botón **+ Publicar producto** (arriba a la derecha) abre `publicar.html`, donde se ingresan todos los datos y se suben hasta **5 fotos desde el dispositivo**. Las imágenes se redimensionan en el navegador y se guardan como data URI en MongoDB; no se usa ningún servicio de imágenes externo.
+- En **Mi perfil → Mis publicaciones** cada producto es clicable y tiene acciones rápidas: **Disponible**, **Reservado**, **Vendido**, **No disponible**, **Editar** (panel en línea) y **Editar todo** (`publicar.html?edit=id`).
+- El menú de filtros está a la **izquierda** y es desplegable (`<details>`); en móvil arranca cerrado para no ocupar la pantalla.
+- El buscador incluye botón de lupa y sugerencias en vivo con los nombres de productos que coinciden; al hacer clic en una sugerencia se abre su ficha.
+- Los estados posibles son `disponible`, `reservado`, `vendido` y `no_disponible`.
 
 ## Variables de entorno del backend
 
